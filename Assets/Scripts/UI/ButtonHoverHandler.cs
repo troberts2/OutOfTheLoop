@@ -5,21 +5,32 @@ using UnityEngine.UI;
 
 public class ButtonHoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler, ISubmitHandler
 {
-    private RectTransform _rectTransform;
-    [SerializeField] private float scaleChange = 0.1f;
-    [SerializeField] private float timeToScale = .25f;
+    [SerializeField] private float timeToFade = .1f;
     [SerializeField] private AudioClip defaultSelectSound;
     [SerializeField] private AudioClip selectSound;
-    private Vector3 _originalScale;
-    [SerializeField] private bool doesScale = false;
+    [SerializeField] private Color fadeToColor;
+    [SerializeField] private bool fadeColor = true;
+
+    private Image targetImage;
+    private Color originalColor;
+    private Tween fadeTween;
 
     /// <summary>
     /// gets variables
     /// </summary>
-    private void Start()
+    private void Awake()
     {
-        _rectTransform = GetComponent<RectTransform>();
-        _originalScale = transform.localScale;
+        if (targetImage == null)
+            targetImage = GetComponent<Image>(); // fallback
+
+        if(targetImage)
+        {
+            originalColor = targetImage.color;
+        }
+        else
+        {
+            originalColor = Color.white;
+        }
     }
 
     /// <summary>
@@ -44,14 +55,20 @@ public class ButtonHoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerE
 
     public void OnSelect(BaseEventData eventData)
     {
-        IncreaseButtonSize();
+        if(fadeColor)
+        {
+            FadeTo(fadeToColor);
+        }
 
         PlaySelectSound();
     }
 
     public void OnDeselect(BaseEventData eventData)
     {
-        DecreaseButtonSize();
+        if (fadeColor)
+        {
+            FadeTo(originalColor);
+        }
 
         PlaySelectSound();
     }
@@ -61,22 +78,12 @@ public class ButtonHoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerE
         PlaySelectSound();
     }
 
-    /// <summary>
-    /// Increases button size animation
-    /// </summary>
-    private void IncreaseButtonSize()
+    private void FadeTo(Color targetColor)
     {
-        _rectTransform.localScale = _originalScale;
-        _rectTransform.DOScale(_rectTransform.localScale.x + scaleChange, timeToScale);
-    }
+        // Kill previous tween if still active
+        fadeTween?.Kill();
 
-    /// <summary>
-    /// decreases button size animation
-    /// </summary>
-    private void DecreaseButtonSize()
-    {
-        _rectTransform.localScale = _originalScale * (1 + scaleChange);
-        _rectTransform.DOScale(_originalScale, timeToScale);
+        fadeTween = targetImage.DOColor(targetColor, timeToFade).SetEase(Ease.OutQuad);
     }
 
     private void PlaySelectSound()

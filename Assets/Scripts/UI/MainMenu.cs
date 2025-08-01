@@ -5,7 +5,19 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    private const string onPlayClickedSceneName = "LevelSelect";
+    private const string onPlayClickedSceneName = "GameScene";
+
+    [SerializeField] private Canvas mainMenuCanvas;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 
     /// <summary>
     /// called when play button on main menu is clicked
@@ -13,6 +25,7 @@ public class MainMenu : MonoBehaviour
     public void Play()
     {
         SceneManager.LoadScene(onPlayClickedSceneName);
+        GameManager.Instance.ResetGame();
     }
 
     /// <summary>
@@ -20,7 +33,7 @@ public class MainMenu : MonoBehaviour
     /// </summary>
     public void Settings()
     {
-        //TODO
+        PauseManager.Instance.OpenOptionsMenu();
     }
 
     /// <summary>
@@ -29,5 +42,10 @@ public class MainMenu : MonoBehaviour
     public void Quit()
     {
         Application.Quit();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        mainMenuCanvas.worldCamera = Camera.main;
     }
 }

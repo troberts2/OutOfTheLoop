@@ -2,6 +2,7 @@ using DG.Tweening;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class GameManager : MonoBehaviour
     private int playerScore = 0;
     [SerializeField] private TextMeshProUGUI scoreText;
     private Vector3 originalScale;
+    [SerializeField] private Canvas scoreCanvas;
 
     public static event Action OnGameReset;
 
@@ -25,6 +27,34 @@ public class GameManager : MonoBehaviour
         }
 
         originalScale = scoreText.transform.localScale;
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        ResetGame();
+        scoreCanvas.worldCamera = Camera.main;
+
+        if(scene.name == "MainMenu")
+        {
+            //turn off score UI
+            scoreText.enabled = false;
+        }
+
+        if(scene.name == "GameScene")
+        {
+            //turn on score UI
+            scoreText.enabled = true;
+        }
     }
 
     public void AddToScore()

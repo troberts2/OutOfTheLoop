@@ -88,11 +88,18 @@ public class AudioManager : MonoBehaviour
         return audioSources[0];
     }
 
-    public void PlaySound(AudioClip clip, float volume = 1f)
+    public void PlaySound(AudioClip clip, bool randomPitch = false)
     {
         AudioSource src = GetAvailableSource();
         src.clip = clip;
-        src.volume = volume;
+        if(randomPitch)
+        {
+            src.pitch = Random.Range(0.9f, 1.1f);
+        }
+        else
+        {
+            src.pitch = 1f;
+        }
         src.Play();
     }
 

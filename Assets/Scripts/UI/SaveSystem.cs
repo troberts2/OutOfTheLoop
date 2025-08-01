@@ -19,7 +19,7 @@ public class SaveSystem : MonoBehaviour
         }
         else
         {
-            Destroy(this);
+            Destroy(gameObject);
         }
 
         saveDirectory = Path.Combine(Application.persistentDataPath, "Saves");

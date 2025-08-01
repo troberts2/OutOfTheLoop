@@ -10,6 +10,8 @@ public class PlayerCollision : MonoBehaviour
     private int currentHealth = 2;
     [SerializeField] private Image[] hearts;
     [SerializeField] private Animator animator;
+    [SerializeField] private AudioClip playerHurt;
+    [SerializeField] private AudioClip death;
 
     private void OnEnable()
     {
@@ -44,6 +46,7 @@ public class PlayerCollision : MonoBehaviour
             return;
         }
 
+        AudioManager.Instance.PlaySound(playerHurt);
         animator.SetTrigger("takeHit");
         for(int i = 0; i < hearts.Length; i++)
         {
@@ -76,6 +79,7 @@ public class PlayerCollision : MonoBehaviour
     private void Die()
     {
         animator.SetTrigger("die");
+        AudioManager.Instance.PlaySound(death);
         GameManager.Instance.ResetGame();
     }
 

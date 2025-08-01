@@ -25,7 +25,11 @@ public class EnemyCircleManager : MonoBehaviour
 
     private void Start()
     {
-        StartCircleSpawning(playerTransform);
+        if(playerTransform != null)
+        {
+            StartCircleSpawning(playerTransform);
+        }
+        
         StartRandomScreenSpawning();
     }
 

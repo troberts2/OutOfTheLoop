@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 public class BasicEnemyCircle : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class BasicEnemyCircle : MonoBehaviour
     private Light2D spriteLight;
     private Material spriteMaterialInstance;
     [SerializeField] private ParticleSystem dieParticleSystem;
+    [SerializeField] private AudioClip popSound;
 
     private bool hasDamagedPlayer = false;
 
@@ -39,11 +41,13 @@ public class BasicEnemyCircle : MonoBehaviour
     private void OnEnable()
     {
         GameManager.OnGameReset += OnGameReset;
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
     }
 
     private void OnDisable()
     {
         GameManager.OnGameReset -= OnGameReset;
+        SceneManager.sceneUnloaded -= OnSceneUnloaded;
     }
 
     // Start is called before the first frame update
@@ -53,6 +57,11 @@ public class BasicEnemyCircle : MonoBehaviour
         spriteMaterialInstance = new Material(baseCircle.material);
         baseCircle.material = spriteMaterialInstance;
         spriteMaterialInstance.SetColor("_Color", baseCircle.color * 3.4f);
+    }
+
+    private void OnSceneUnloaded(Scene scene)
+    {
+        OnGameReset();
     }
 
     public void ActivateDeathCircle()
@@ -97,13 +106,17 @@ public class BasicEnemyCircle : MonoBehaviour
         }
 
         GameManager.Instance.AddToScore();
+        if(SceneManager.GetActiveScene().name == "GameScene")
+        {
+            AudioManager.Instance.PlaySound(popSound, true);
+        }
+        ParticleSystemPool.Instance.PlayParticleSystem(transform.position);
 
         Invoke(nameof(PlayDeathParticle), destroyAfterActivateDelay);
     }
 
     private void PlayDeathParticle()
     {
-        ParticleSystemPool.Instance.PlayParticleSystem(transform.position);
         OnGameReset();
     }
 

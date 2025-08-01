@@ -226,6 +226,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   dieParticleSystem: {fileID: 332044492782360302, guid: 87975fdf921b9244894726b61e534093, type: 3}
+  popSound: {fileID: 8300000, guid: 61ffa3820cdd7da4092e81d0813ac3cc, type: 3}
 --- !u!58 &743402744147134276
 CircleCollider2D:
   m_ObjectHideFlags: 0

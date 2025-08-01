@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class PauseManager : MonoBehaviour
 {
+    public static PauseManager Instance;
     private PlayerControls playerControls;
     private InputAction pauseBack;
     public static event Action OnPause;
@@ -14,6 +15,7 @@ public class PauseManager : MonoBehaviour
     private bool isPaused = false;
     private bool isOptions = false;
     [SerializeField] private float menuAnimTime = 0.35f;
+    [SerializeField] private Canvas pauseCanvas;
 
     [Header("Pause Menu")]
     [SerializeField] private RectTransform pausePanel;
@@ -25,7 +27,23 @@ public class PauseManager : MonoBehaviour
 
     private void Awake()
     {
+        if(Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
         playerControls = new PlayerControls();
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log("Loaded scene: " + scene.name);
+
+        pauseCanvas.worldCamera = Camera.main;
     }
 
     private void OnEnable()
@@ -34,39 +52,58 @@ public class PauseManager : MonoBehaviour
         pauseBack = playerControls.Player.PauseBack;
         pauseBack.performed += OnPauseBack;
         pauseBack.Enable();
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         pauseBack.performed -= OnPauseBack;
         pauseBack.Disable();
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     void OnPauseBack(InputAction.CallbackContext context)
     {
-        if(!isPaused)
+        if(SceneManager.GetActiveScene().name == "GameScene")
         {
-            //start pause and call OnPause functions from other scripts
-            OnPause?.Invoke();
+            if(!isPaused)
+            {
+                //start pause and call OnPause functions from other scripts
+                OnPause?.Invoke();
 
-            //bring up pause menu
-            OpenPauseMenu();
+                //bring up pause menu
+                OpenPauseMenu();
+            }
+            else // is paused
+            { 
+                //if not in options menu (close pause screen)
+                if(!isOptions)
+                {
+                    OnResume?.Invoke();
+
+                    ClosePauseMenu();
+                }
+                else
+                {
+                    //if is in options menu (should close options to pause)
+                    CloseOptionsMenu();
+                }
+            }
         }
-        else // is paused
-        { 
-            //if not in options menu (close pause screen)
+        else if(SceneManager.GetActiveScene().name == "MainMenu")
+        {
             if(!isOptions)
             {
-                OnResume?.Invoke();
-
-                ClosePauseMenu();
+                OpenOptionsMenu();
             }
             else
             {
-                //if is in options menu (should close options to pause)
                 CloseOptionsMenu();
             }
         }
+        
     }
 
     private void OpenPauseMenu()
@@ -117,5 +154,6 @@ public class PauseManager : MonoBehaviour
     public void MainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+        ClosePauseMenu();
     }
 }
