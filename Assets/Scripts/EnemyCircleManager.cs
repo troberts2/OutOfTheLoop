@@ -56,7 +56,7 @@ public class EnemyCircleManager : MonoBehaviour
             Vector3 worldPos = mainCam.ScreenToWorldPoint(screenPos);
             worldPos.z = 0f;
 
-            Instantiate(PickRandomCircleToSpawn(), worldPos, Quaternion.identity);
+            PickRandomCircleToSpawn(worldPos);
             yield return new WaitForSeconds(randomSpawnRate);
         }
     }
@@ -80,24 +80,15 @@ public class EnemyCircleManager : MonoBehaviour
         {
             Vector2 randomPoint = Random.insideUnitCircle * circleRadius;
             Vector3 spawnPos = center.position + new Vector3(randomPoint.x, randomPoint.y, 0f);
-            Instantiate(PickRandomCircleToSpawn(), spawnPos, Quaternion.identity);
+            PickRandomCircleToSpawn(spawnPos);
             yield return new WaitForSeconds(circleSpawnInterval);
         }
     }
 
-    private GameObject PickRandomCircleToSpawn()
+    private void PickRandomCircleToSpawn(Vector3 position)
     {
-        float random = Random.Range(0, 100);
+        int random = Random.Range(0, 100);
 
-        if (random > 90)
-            return enemyCircleList[4]; //biggest 10%
-        else if (random > 70)
-            return enemyCircleList[3]; // second biggest 20%
-        else if (random > 50) // middle circle 20%
-            return enemyCircleList[2];
-        else if (random > 30)
-            return enemyCircleList[1]; // second smallest 20%
-        else
-            return enemyCircleList[0]; //smallest 30%
+        EnemyPool.Instance.ActivateEnemy(position, random);
     }
 }

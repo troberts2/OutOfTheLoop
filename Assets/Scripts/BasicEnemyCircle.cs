@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Rendering.Universal;
 
 public class BasicEnemyCircle : MonoBehaviour
 {
@@ -10,12 +11,15 @@ public class BasicEnemyCircle : MonoBehaviour
     [SerializeField] private float colorDuration = 0.5f;
     [SerializeField] private float turnRedDuration = .1f;
     [SerializeField] private float destroyAfterActivateDelay = 0.2f;
-    private CircleCollider2D circleCollider;
+    [SerializeField] private CircleCollider2D circleCollider;
     private Sequence rainbowSequence;
     private float scaleDuration;
     [SerializeField] private float scaleDurationMinimum= 0.5f;
     [SerializeField] private float scaleDurationMaximum = 0.1f;
     [SerializeField] private LayerMask playerLayer;
+    private Light2D spriteLight;
+    private Material spriteMaterialInstance;
+    [SerializeField] private ParticleSystem dieParticleSystem;
 
     private bool hasDamagedPlayer = false;
 
@@ -32,15 +36,30 @@ public class BasicEnemyCircle : MonoBehaviour
 
     public bool HasDamagedPlayer { get => hasDamagedPlayer; set => hasDamagedPlayer = value; }
 
+    private void OnEnable()
+    {
+        GameManager.OnGameReset += OnGameReset;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnGameReset -= OnGameReset;
+    }
 
     // Start is called before the first frame update
     private void Start()
     {
-        circleCollider = GetComponent<CircleCollider2D>();
+        spriteLight = GetComponentInChildren<Light2D>();
+        spriteMaterialInstance = new Material(baseCircle.material);
+        baseCircle.material = spriteMaterialInstance;
+        spriteMaterialInstance.SetColor("_Color", baseCircle.color * 3.4f);
+    }
+
+    public void ActivateDeathCircle()
+    {
         scaleDuration = Random.Range(scaleDurationMinimum, scaleDurationMaximum);
         StartRandomRainbowLoop();
         GrowIndicator();
-
 
         Invoke(nameof(TurnRed), scaleDuration - turnRedDuration);
         Invoke(nameof(ActivateColliderAndDie), scaleDuration);
@@ -79,7 +98,13 @@ public class BasicEnemyCircle : MonoBehaviour
 
         GameManager.Instance.AddToScore();
 
-        Destroy(gameObject, destroyAfterActivateDelay);
+        Invoke(nameof(PlayDeathParticle), destroyAfterActivateDelay);
+    }
+
+    private void PlayDeathParticle()
+    {
+        ParticleSystemPool.Instance.PlayParticleSystem(transform.position);
+        OnGameReset();
     }
 
     private void StartRandomRainbowLoop()
@@ -126,6 +151,24 @@ public class BasicEnemyCircle : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        spriteLight.color = baseCircle.color;
+        spriteMaterialInstance.SetColor("_Color", baseCircle.color * 3.4f);
+    }
+
+    /// <summary>
+    /// resets circle
+    /// </summary>
+    private void OnGameReset()
+    {
+        indicatorCircle.DOKill();
+        indicatorCircle.localScale = Vector2.zero;
+
+        baseCircle.DOKill();
+        rainbowSequence.Kill();
+        baseCircle.color = Color.white;
+
+        circleCollider.enabled = false;
+
+        gameObject.SetActive(false);
     }
 }

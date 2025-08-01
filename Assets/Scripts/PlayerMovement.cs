@@ -14,7 +14,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Confined;
         mainCam = Camera.main;
     }
 
