@@ -106,11 +106,23 @@ public class BasicEnemyCircle : MonoBehaviour
         }
 
         GameManager.Instance.AddToScore();
-        if(SceneManager.GetActiveScene().name == "GameScene")
+        if(SceneManager.GetActiveScene().name == "GameScene" && GameManager.Instance.isGameStarted)
         {
             AudioManager.Instance.PlaySound(popSound, true);
         }
-        ParticleSystemPool.Instance.PlayParticleSystem(transform.position);
+
+        if(SceneManager.GetActiveScene().name == "GameScene")
+        {
+            if(GameManager.Instance.isGameStarted)
+            {
+                ParticleSystemPool.Instance.PlayParticleSystem(transform.position);
+            }
+        }
+        else //if other scene
+        {
+            ParticleSystemPool.Instance.PlayParticleSystem(transform.position);
+        }
+        
 
         Invoke(nameof(PlayDeathParticle), destroyAfterActivateDelay);
     }

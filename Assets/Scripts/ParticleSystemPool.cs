@@ -26,6 +26,26 @@ public class ParticleSystemPool : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void OnEnable()
+    {
+        GameManager.OnGameReset += OnGameReset;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnGameReset -= OnGameReset;
+    }
+
+    private void OnGameReset()
+    {
+        //clear particles
+        foreach (ParticleSystem p in particleSystems)
+        {
+            p.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); // fully reset
+        }
+    }
+
     private void CreatePool()
     {
         particleSystems = new List<ParticleSystem>();

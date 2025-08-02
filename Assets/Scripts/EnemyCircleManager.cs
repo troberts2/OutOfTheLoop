@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyCircleManager : MonoBehaviour
 {
@@ -23,16 +24,43 @@ public class EnemyCircleManager : MonoBehaviour
         mainCam = Camera.main;
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        if(playerTransform != null)
-        {
-            StartCircleSpawning(playerTransform);
-        }
-        
-        StartRandomScreenSpawning();
+        GameManager.OnGameReset += OnGameReset;
+        PlayerCollision.OnPlayerDeath += OnPlayerDeath;
     }
 
+    private void OnDisable()
+    {
+        GameManager.OnGameReset -= OnGameReset;
+        PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+    }
+
+    private void OnPlayerDeath()
+    {
+        StopCircleSpawning();
+        StopRandomScreenSpawning();
+    }
+
+    private void OnGameReset()
+    {
+        if (SceneManager.GetActiveScene().name == "GameScene")
+        {
+            //invoke on 3 second delay for the countdown sequence
+            Invoke(nameof(StartRandomSpawning), 3f);
+        }
+        else
+        {
+            //dont do player tracking on main menu
+            StartRandomScreenSpawning();
+        }
+    }
+
+    private void StartRandomSpawning()
+    {
+        StartCircleSpawning(playerTransform);
+        StartRandomScreenSpawning();
+    }
 
     // ------------ Random Screen Spawning ------------
 

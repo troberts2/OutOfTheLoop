@@ -41,8 +41,6 @@ public class PauseManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log("Loaded scene: " + scene.name);
-
         pauseCanvas.worldCamera = Camera.main;
     }
 
@@ -58,8 +56,11 @@ public class PauseManager : MonoBehaviour
 
     private void OnDisable()
     {
-        pauseBack.performed -= OnPauseBack;
-        pauseBack.Disable();
+        if (pauseBack != null)
+        {
+            pauseBack.performed -= OnPauseBack;
+            pauseBack.Disable();
+        }
 
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }

@@ -11,10 +11,34 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 maxBounds;
     [SerializeField] private float padding = 0.5f; // Offset if your sprite has width/height
     private Camera mainCam;
+    private bool canMove = true;
 
     private void Start()
     {
         mainCam = Camera.main;
+    }
+
+    private void OnEnable()
+    {
+        PlayerCollision.OnPlayerDeath += OnPlayerDeath;
+        GameManager.OnGameReset += OnGameReset;
+    }
+
+    private void OnDisable()
+    {
+        PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+        GameManager.OnGameReset -= OnGameReset;
+    }
+
+    private void OnPlayerDeath()
+    {
+        canMove = false;
+    }
+
+    private void OnGameReset()
+    {
+        canMove = true;
+        animator.Rebind();
     }
 
     void Update()
@@ -24,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
         float distToMouse = Vector2.Distance(transform.position, mouseWorldPos);
 
         //follow mouse
-        if(distToMouse > followRange)
+        if(distToMouse > followRange && canMove)
             transform.position = Vector3.Lerp(transform.position, mouseWorldPos, followSpeed * Time.deltaTime);
 
         //animations

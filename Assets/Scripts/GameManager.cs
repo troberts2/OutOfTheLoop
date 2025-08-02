@@ -7,10 +7,11 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    private int playerScore = 0;
+    public int playerScore = 0;
     [SerializeField] private TextMeshProUGUI scoreText;
     private Vector3 originalScale;
     [SerializeField] private Canvas scoreCanvas;
+    public bool isGameStarted = false;
 
     public static event Action OnGameReset;
 
@@ -32,15 +33,24 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
+        PlayerCollision.OnPlayerDeath += OnPlayerDeath;
     }
 
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+    }
+
+    private void OnPlayerDeath()
+    {
+        isGameStarted = false;
+        scoreText.enabled = false;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        isGameStarted = false;
         ResetGame();
         scoreCanvas.worldCamera = Camera.main;
 
@@ -49,16 +59,18 @@ public class GameManager : MonoBehaviour
             //turn off score UI
             scoreText.enabled = false;
         }
+    }
 
-        if(scene.name == "GameScene")
-        {
-            //turn on score UI
-            scoreText.enabled = true;
-        }
+    private void ChangeIsGameStartedTrue()
+    {
+        isGameStarted = true;
+        scoreText.enabled = true;
     }
 
     public void AddToScore()
     {
+        if (!isGameStarted) return;
+
         playerScore+= 100;
         scoreText.text = playerScore.ToString();
         Pop();
@@ -90,5 +102,10 @@ public class GameManager : MonoBehaviour
         OnGameReset?.Invoke();
         playerScore = 0;
         scoreText.text = playerScore.ToString();
+        if(SceneManager.GetActiveScene().name == "GameScene")
+        {
+            //make player able to turn points from circle destroying
+            Invoke(nameof(ChangeIsGameStartedTrue), 3f);
+        }
     }
 }

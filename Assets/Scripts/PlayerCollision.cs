@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using DG.Tweening;
+using System;
 
 public class PlayerCollision : MonoBehaviour
 {
@@ -12,9 +13,13 @@ public class PlayerCollision : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private AudioClip playerHurt;
     [SerializeField] private AudioClip death;
+    private BoxCollider2D boxCollider;
+
+    public static event Action OnPlayerDeath;
 
     private void OnEnable()
     {
+        boxCollider = GetComponent<BoxCollider2D>();
         GameManager.OnGameReset += OnReset;
     }
 
@@ -40,29 +45,22 @@ public class PlayerCollision : MonoBehaviour
     public void TakeDamage()
     {
         currentHealth--;
-        if (currentHealth < 0)
-        {
-            Die();
-            return;
-        }
 
-        AudioManager.Instance.PlaySound(playerHurt);
-        animator.SetTrigger("takeHit");
-        for(int i = 0; i < hearts.Length; i++)
+        for (int i = 0; i < hearts.Length; i++)
         {
-            if(i <= currentHealth)
+            if (i <= currentHealth)
             {
                 hearts[i].enabled = true;
             }
             else
             {
-                hearts[i].enabled=false;
+                hearts[i].enabled = false;
             }
         }
 
-        foreach(var heart in hearts)
+        foreach (var heart in hearts)
         {
-            if(heart.enabled)
+            if (heart.enabled)
             {
                 heart.DOKill();
                 heart.transform.DOKill();
@@ -71,16 +69,26 @@ public class PlayerCollision : MonoBehaviour
                     .SetEase(Ease.OutQuad)
                     .OnComplete(() => {
                         heart.transform.DOScale(Vector3.one, 0.1f).SetEase(Ease.InQuad);
-                });
+                    });
             }
         }
+
+        if (currentHealth < 0)
+        {
+            Die();
+            return;
+        }
+
+        AudioManager.Instance.PlaySound(playerHurt);
+        animator.SetTrigger("takeHit");
     }
 
     private void Die()
     {
         animator.SetTrigger("die");
         AudioManager.Instance.PlaySound(death);
-        GameManager.Instance.ResetGame();
+        boxCollider.enabled = false;
+        OnPlayerDeath?.Invoke();
     }
 
     private void OnReset()
@@ -90,5 +98,6 @@ public class PlayerCollision : MonoBehaviour
             heart.enabled = true;
         }
         currentHealth = 2;
+        boxCollider.enabled = true;
     }
 }
