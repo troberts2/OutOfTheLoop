@@ -243,6 +243,9 @@ MonoBehaviour:
   circleSpawnInterval: 1
   circleRadius: 2
   playerTransform: {fileID: 0}
+  spawnDecay: 0.99142
+  playerSpawnRateMinimum: 0.2
+  randomSpawnRateMinimum: 0.09
 --- !u!4 &78498903
 Transform:
   m_ObjectHideFlags: 0
@@ -1621,7 +1624,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1545581282}
   m_OnClick:
     m_PersistentCalls:

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
@@ -24,6 +25,7 @@ public class MainMenu : MonoBehaviour
     /// </summary>
     public void Play()
     {
+        EventSystem.current.enabled = false;
         SceneManager.LoadScene(onPlayClickedSceneName);
         GameManager.Instance.ResetGame();
     }

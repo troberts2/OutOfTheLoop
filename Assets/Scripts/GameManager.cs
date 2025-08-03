@@ -108,4 +108,6 @@ public class GameManager : MonoBehaviour
             Invoke(nameof(ChangeIsGameStartedTrue), 3f);
         }
     }
+
+
 }

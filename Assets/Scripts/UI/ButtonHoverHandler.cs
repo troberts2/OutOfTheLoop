@@ -50,7 +50,10 @@ public class ButtonHoverHandler : MonoBehaviour, IPointerEnterHandler, IPointerE
     public void OnPointerExit(PointerEventData eventData)
     {
         //set event system selected
-        EventSystem.current.SetSelectedGameObject(null);
+        if(EventSystem.current !=null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }     
     }
 
     public void OnSelect(BaseEventData eventData)

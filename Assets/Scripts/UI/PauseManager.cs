@@ -65,9 +65,24 @@ public class PauseManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnPauseBack(InputAction.CallbackContext context)
+    public void OnWebGLBlur()
     {
         if(SceneManager.GetActiveScene().name == "GameScene")
+        {
+            if(!isPaused)
+            {
+                //start pause and call OnPause functions from other scripts
+                OnPause?.Invoke();
+
+                //bring up pause menu
+                OpenPauseMenu();
+            }
+        }
+    }
+
+    void OnPauseBack(InputAction.CallbackContext context)
+    {
+        if(SceneManager.GetActiveScene().name == "GameScene" && GameManager.Instance.isGameStarted)
         {
             if(!isPaused)
             {

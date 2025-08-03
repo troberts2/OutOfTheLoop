@@ -24,6 +24,7 @@ public class CountdownSequence : MonoBehaviour
 
     private void OnResetGame()
     {
+        countdownText.enabled = false;
         if(SceneManager.GetActiveScene().name == "GameScene")
         {
             StartCoroutine(PlayCountdown());

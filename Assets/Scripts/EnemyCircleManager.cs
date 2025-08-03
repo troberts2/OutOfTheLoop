@@ -15,7 +15,10 @@ public class EnemyCircleManager : MonoBehaviour
     [SerializeField] private float circleSpawnInterval = 2f;
     [SerializeField] private float circleRadius = 3f;
     [SerializeField] private Transform playerTransform;
+    [SerializeField] private float spawnDecay = 0.99142f; // lower from 0.5 to 0.1 in about a minute
     private Coroutine circleSpawnRoutine;
+    [SerializeField] private float playerSpawnRateMinimum = .2f;
+    [SerializeField] private float randomSpawnRateMinimum = .09f;
 
     private Camera mainCam;
 
@@ -77,6 +80,7 @@ public class EnemyCircleManager : MonoBehaviour
 
     private IEnumerator RandomScreenSpawnLoop()
     {
+        float tempRandomSpawnRate = randomSpawnRate;
         while (true)
         {
             Vector3 screenPos = new Vector3(
@@ -89,7 +93,12 @@ public class EnemyCircleManager : MonoBehaviour
             worldPos.z = 0f;
 
             PickRandomCircleToSpawn(worldPos);
-            yield return new WaitForSeconds(randomSpawnRate);
+            yield return new WaitForSeconds(tempRandomSpawnRate);
+            if (SceneManager.GetActiveScene().name == "GameScene")
+            {
+                tempRandomSpawnRate *= spawnDecay;
+                tempRandomSpawnRate = Mathf.Max(tempRandomSpawnRate, randomSpawnRateMinimum);
+            }
         }
     }
 
@@ -108,12 +117,18 @@ public class EnemyCircleManager : MonoBehaviour
 
     private IEnumerator CircleSpawnLoop(Transform center)
     {
+        float tempCircleSpawnInterval = circleSpawnInterval;
         while (true)
         {
             Vector2 randomPoint = Random.insideUnitCircle * circleRadius;
             Vector3 spawnPos = center.position + new Vector3(randomPoint.x, randomPoint.y, 0f);
             PickRandomCircleToSpawn(spawnPos);
-            yield return new WaitForSeconds(circleSpawnInterval);
+            yield return new WaitForSeconds(tempCircleSpawnInterval);
+            if(SceneManager.GetActiveScene().name == "GameScene")
+            {
+                tempCircleSpawnInterval *= spawnDecay;
+                tempCircleSpawnInterval = Mathf.Max(tempCircleSpawnInterval, playerSpawnRateMinimum);
+            }
         }
     }
 

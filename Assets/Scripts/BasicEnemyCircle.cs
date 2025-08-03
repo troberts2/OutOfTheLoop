@@ -83,6 +83,11 @@ public class BasicEnemyCircle : MonoBehaviour
         baseCircle.DOColor(Color.red, .1f);
     }
 
+    private void NearMiss()
+    {
+
+    }
+
     private void ActivateColliderAndDie()
     {
         circleCollider.enabled = true;

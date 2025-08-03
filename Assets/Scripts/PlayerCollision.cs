@@ -28,20 +28,6 @@ public class PlayerCollision : MonoBehaviour
         GameManager.OnGameReset -= OnReset;
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if(collision.CompareTag("Enemy"))
-        {
-            BasicEnemyCircle e = collision.GetComponent<BasicEnemyCircle>();
-            if (!e.HasDamagedPlayer)
-            {
-                e.HasDamagedPlayer = true;
-                TakeDamage();
-            }
-            
-        }
-    }
-
     public void TakeDamage()
     {
         currentHealth--;
