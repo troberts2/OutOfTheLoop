@@ -80,6 +80,7 @@ GameObject:
   - component: {fileID: 6765806002336842334}
   - component: {fileID: 3564359570938764800}
   - component: {fileID: 7443029942671521353}
+  - component: {fileID: 2599056727375161108}
   m_Layer: 0
   m_Name: MainMenu
   m_TagString: Untagged
@@ -169,7 +170,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.94509804, g: 0.9019608, b: 0.050980393, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -201,6 +202,23 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2599056727375161108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672614133338000110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e870aaa413a94de40af2c3f64e6eb94a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeToFade: 0.1
+  defaultSelectSound: {fileID: 8300000, guid: 0679a8feeaa99c84dbb18ef8bca6fed2, type: 3}
+  selectSound: {fileID: 0}
+  fadeToColor: {r: 0.94509804, g: 0.9019608, b: 0.050980393, a: 1}
+  fadeColor: 1
 --- !u!1 &3322228183692021788
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +231,7 @@ GameObject:
   - component: {fileID: 1110699752778846091}
   - component: {fileID: 1342968789000644774}
   - component: {fileID: 5477717560787324421}
+  - component: {fileID: 6832858819491739700}
   m_Layer: 0
   m_Name: Retry
   m_TagString: Untagged
@@ -302,7 +321,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.94509804, g: 0.9019608, b: 0.050980393, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -334,6 +353,23 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &6832858819491739700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3322228183692021788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e870aaa413a94de40af2c3f64e6eb94a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeToFade: 0.1
+  defaultSelectSound: {fileID: 8300000, guid: 0679a8feeaa99c84dbb18ef8bca6fed2, type: 3}
+  selectSound: {fileID: 0}
+  fadeToColor: {r: 0.94509804, g: 0.9019608, b: 0.050980393, a: 1}
+  fadeColor: 1
 --- !u!1 &4739606859713249525
 GameObject:
   m_ObjectHideFlags: 0

@@ -51,8 +51,16 @@ public class OptionsSettings : MonoBehaviour
         LoadMusicVolume(save);
         LoadSfxVolume(save);
 
+#if UNITY_WEBGL
+        //set resolution to 1280x720 for webGL window. Player cannot fullscreen or change res
+        selectedResolution = 1;
+        //Screen.SetResolution(1280, 720, isFullscreen);
+#endif
+
+#if UNITY_STANDALONE
         //set saved fullscreen and resolution options
         SetSavedResolution(save);
+#endif
     }
 
     private Resolution CreateNewResolution(int width, int height)
