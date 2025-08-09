@@ -8,17 +8,19 @@ public class EnemyCircleManager : MonoBehaviour
     [SerializeField] private GameObject[] enemyCircleList;
 
     [Header("Random Screen Spawn")]
-    [SerializeField] private float randomSpawnRate = 1f; // seconds between spawns
     private Coroutine randomSpawnRoutine;
+    [SerializeField] private float startInterval = 0.5f;
+    [SerializeField] private float endInterval = 0.1f;
+    [SerializeField] private float difficultyRampTime = 45f; // seconds to reach max difficulty
+    private float elapsedTime = 0;
+    private float currentInterval;
+    private float t = 0;
 
     [Header("Circular Spawn")]
     [SerializeField] private float circleSpawnInterval = 2f;
     [SerializeField] private float circleRadius = 3f;
     [SerializeField] private Transform playerTransform;
-    [SerializeField] private float spawnDecay = 0.99142f; // lower from 0.5 to 0.1 in about a minute
     private Coroutine circleSpawnRoutine;
-    [SerializeField] private float playerSpawnRateMinimum = .2f;
-    [SerializeField] private float randomSpawnRateMinimum = .09f;
 
     private Camera mainCam;
 
@@ -47,6 +49,10 @@ public class EnemyCircleManager : MonoBehaviour
 
     private void OnGameReset()
     {
+        currentInterval = startInterval;
+        elapsedTime = 0;
+        t = 0;
+
         if (SceneManager.GetActiveScene().name == "GameScene")
         {
             //invoke on 3 second delay for the countdown sequence
@@ -80,7 +86,6 @@ public class EnemyCircleManager : MonoBehaviour
 
     private IEnumerator RandomScreenSpawnLoop()
     {
-        float tempRandomSpawnRate = randomSpawnRate;
         while (true)
         {
             Vector3 screenPos = new Vector3(
@@ -93,11 +98,13 @@ public class EnemyCircleManager : MonoBehaviour
             worldPos.z = 0f;
 
             PickRandomCircleToSpawn(worldPos);
-            yield return new WaitForSeconds(tempRandomSpawnRate);
             if (SceneManager.GetActiveScene().name == "GameScene")
             {
-                tempRandomSpawnRate *= spawnDecay;
-                tempRandomSpawnRate = Mathf.Max(tempRandomSpawnRate, randomSpawnRateMinimum);
+                yield return new WaitForSeconds(currentInterval);
+            }
+            else
+            {
+                yield return new WaitForSeconds(startInterval / 2);
             }
         }
     }
@@ -117,17 +124,15 @@ public class EnemyCircleManager : MonoBehaviour
 
     private IEnumerator CircleSpawnLoop(Transform center)
     {
-        float tempCircleSpawnInterval = circleSpawnInterval;
         while (true)
         {
             Vector2 randomPoint = Random.insideUnitCircle * circleRadius;
             Vector3 spawnPos = center.position + new Vector3(randomPoint.x, randomPoint.y, 0f);
             PickRandomCircleToSpawn(spawnPos);
-            yield return new WaitForSeconds(tempCircleSpawnInterval);
+
             if(SceneManager.GetActiveScene().name == "GameScene")
             {
-                tempCircleSpawnInterval *= spawnDecay;
-                tempCircleSpawnInterval = Mathf.Max(tempCircleSpawnInterval, playerSpawnRateMinimum);
+                yield return new WaitForSeconds(currentInterval * 4);
             }
         }
     }
@@ -137,5 +142,17 @@ public class EnemyCircleManager : MonoBehaviour
         int random = Random.Range(0, 100);
 
         EnemyPool.Instance.ActivateEnemy(position, random);
+    }
+
+
+    private void Update()
+    {
+        if(GameManager.Instance.isGameStarted)
+        {
+            elapsedTime += Time.deltaTime;
+
+            t = Mathf.Clamp01(elapsedTime / difficultyRampTime);
+            currentInterval = Mathf.Lerp(startInterval, endInterval, t);
+        }
     }
 }

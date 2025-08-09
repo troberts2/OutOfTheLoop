@@ -22,6 +22,7 @@ public class BasicEnemyCircle : MonoBehaviour
     private Material spriteMaterialInstance;
     [SerializeField] private ParticleSystem dieParticleSystem;
     [SerializeField] private AudioClip popSound;
+    private bool isHealCircle;
 
     private bool hasDamagedPlayer = false;
 
@@ -30,7 +31,6 @@ public class BasicEnemyCircle : MonoBehaviour
         Color.red,
         new Color(1f, 0.5f, 0f),     // Orange
         Color.yellow,
-        Color.green,
         Color.cyan,
         Color.blue,
         new Color(0.6f, 0f, 1f),     // Indigo/Violet
@@ -66,6 +66,14 @@ public class BasicEnemyCircle : MonoBehaviour
 
     public void ActivateDeathCircle()
     {
+
+        float random = Random.Range(0f, 100f);
+
+        if(random < 5f)
+        {
+            //5% chance spawn heal circle
+            isHealCircle = true;
+        }
         scaleDuration = Random.Range(scaleDurationMinimum, scaleDurationMaximum);
         StartRandomRainbowLoop();
         GrowIndicator();
@@ -77,15 +85,22 @@ public class BasicEnemyCircle : MonoBehaviour
     private void GrowIndicator()
     {
         indicatorCircle.DOScale(1, scaleDuration);
+        if(isHealCircle)
+        {
+            indicatorCircle.GetComponent<SpriteRenderer>().color = Color.green;
+        } 
     }
     private void TurnRed()
     {
-        baseCircle.DOColor(Color.red, .1f);
-    }
-
-    private void NearMiss()
-    {
-
+        if(isHealCircle)
+        {
+            baseCircle.DOColor(Color.green, .1f);
+        }
+        else
+        {
+            baseCircle.DOColor(Color.red, .1f);
+        }
+        
     }
 
     private void ActivateColliderAndDie()
@@ -104,7 +119,14 @@ public class BasicEnemyCircle : MonoBehaviour
             {
                 if (col != null && col.CompareTag("Player"))
                 {
-                    col.GetComponent<PlayerCollision>().TakeDamage();
+                    if(isHealCircle)
+                    {
+                        col.GetComponent<PlayerCollision>().HealPlayer();
+                    }
+                    else
+                    {
+                        col.GetComponent<PlayerCollision>().TakeDamage();
+                    }
                     HasDamagedPlayer = true;
                 }
             }
@@ -198,6 +220,9 @@ public class BasicEnemyCircle : MonoBehaviour
         baseCircle.color = Color.white;
 
         circleCollider.enabled = false;
+
+        indicatorCircle.GetComponent<SpriteRenderer>().color = Color.red;
+        isHealCircle = false;
 
         gameObject.SetActive(false);
     }

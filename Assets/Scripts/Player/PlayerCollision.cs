@@ -13,9 +13,13 @@ public class PlayerCollision : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private AudioClip playerHurt;
     [SerializeField] private AudioClip death;
+    [SerializeField] private AudioClip playerHeal;
+    [SerializeField] private float freezeDuration = 0.1f; // How long the freeze lasts
+    [SerializeField] private AudioClip multiplierPickup;
     private BoxCollider2D boxCollider;
 
     public static event Action OnPlayerDeath;
+    public static event Action OnPlayerHurt;
 
     private void OnEnable()
     {
@@ -28,10 +32,38 @@ public class PlayerCollision : MonoBehaviour
         GameManager.OnGameReset -= OnReset;
     }
 
+    public void HealPlayer()
+    {
+        currentHealth++;
+
+        UpdateHeartUI();
+
+        currentHealth = Mathf.Min(currentHealth, 2);
+
+        AudioManager.Instance.PlaySound(playerHeal);
+    }
+
     public void TakeDamage()
     {
+        OnPlayerHurt?.Invoke();
         currentHealth--;
 
+        UpdateHeartUI();
+
+        if (currentHealth < 0)
+        {
+            Die();
+            return;
+        }
+
+        AudioManager.Instance.PlaySound(playerHurt);
+        TriggerHitStop();
+        PixelPerfectShake.Instance.Shake();
+        animator.SetTrigger("takeHit");
+    }
+
+    private void UpdateHeartUI()
+    {
         for (int i = 0; i < hearts.Length; i++)
         {
             if (i <= currentHealth)
@@ -58,19 +90,12 @@ public class PlayerCollision : MonoBehaviour
                     });
             }
         }
-
-        if (currentHealth < 0)
-        {
-            Die();
-            return;
-        }
-
-        AudioManager.Instance.PlaySound(playerHurt);
-        animator.SetTrigger("takeHit");
     }
 
     private void Die()
     {
+        TriggerHitStop();
+        PixelPerfectShake.Instance.Shake();
         animator.SetTrigger("die");
         AudioManager.Instance.PlaySound(death);
         boxCollider.enabled = false;
@@ -85,5 +110,32 @@ public class PlayerCollision : MonoBehaviour
         }
         currentHealth = 2;
         boxCollider.enabled = true;
+    }
+
+    private void TriggerHitStop()
+    {
+        StartCoroutine(DoFreezeFrame());
+    }
+
+    private IEnumerator DoFreezeFrame()
+    {
+        float originalTimeScale = Time.timeScale;
+        Time.timeScale = 0.1f;
+
+        // Wait in *real* time so it's not affected by timeScale
+        yield return new WaitForSecondsRealtime(freezeDuration);
+
+        Time.timeScale = originalTimeScale;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.CompareTag("multiplier2x"))
+        {
+            GameManager.Instance.multText.SetMultiplier(2);
+            ParticleSystemPool.Instance.PlayMultiplierParticleSystem(collision.transform.position);
+            AudioManager.Instance.PlaySound(multiplierPickup);
+            collision.GetComponent<Multiplier>().TurnOff();
+        }
     }
 }

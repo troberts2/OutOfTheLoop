@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreText;
     private Vector3 originalScale;
     [SerializeField] private Canvas scoreCanvas;
+    public MultiplierText multText;
     public bool isGameStarted = false;
 
     public static event Action OnGameReset;
@@ -59,19 +60,26 @@ public class GameManager : MonoBehaviour
             //turn off score UI
             scoreText.enabled = false;
         }
+        if (SceneManager.GetActiveScene().name == "GameScene")
+        {
+            //make player able to turn points from circle destroying
+            Invoke(nameof(ChangeIsGameStartedTrue), 3f);
+        }
     }
 
-    private void ChangeIsGameStartedTrue()
+    public void ChangeIsGameStartedTrue()
     {
         isGameStarted = true;
         scoreText.enabled = true;
+        //make multipliers spawn
+        MultiplierManager.Instance.StartSpawning();
     }
 
     public void AddToScore()
     {
         if (!isGameStarted) return;
 
-        playerScore+= 100;
+        playerScore+= 10 * multText.currentMultiplier;
         scoreText.text = playerScore.ToString();
         Pop();
     }
@@ -102,11 +110,6 @@ public class GameManager : MonoBehaviour
         OnGameReset?.Invoke();
         playerScore = 0;
         scoreText.text = playerScore.ToString();
-        if(SceneManager.GetActiveScene().name == "GameScene")
-        {
-            //make player able to turn points from circle destroying
-            Invoke(nameof(ChangeIsGameStartedTrue), 3f);
-        }
     }
 
 

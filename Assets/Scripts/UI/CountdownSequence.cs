@@ -49,6 +49,10 @@ public class CountdownSequence : MonoBehaviour
 
             // Wait for this number to finish its time
             float waitTime = (i < 3) ? 1f : 1f; // 1 sec per number including GO
+            if(i == 3) //go
+            {
+                GameManager.Instance.ChangeIsGameStartedTrue();
+            }
             yield return new WaitForSeconds(waitTime - .2f);
 
             // Fade out quickly

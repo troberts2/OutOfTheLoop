@@ -46,3 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyParticles: {fileID: 2003887355464662972, guid: c51f482beed41e941a80921188b1fa05, type: 3}
   poolSize: 50
+  multiplierParticle: {fileID: 5834286256572379504, guid: af55affe31677204bbcf0798fd1363ac, type: 3}
+  multiplierPoolSize: 5
