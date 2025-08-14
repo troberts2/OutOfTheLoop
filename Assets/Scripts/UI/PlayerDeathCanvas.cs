@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerDeathCanvas : MonoBehaviour
 {
@@ -17,18 +18,37 @@ public class PlayerDeathCanvas : MonoBehaviour
     private Vector3 retryAnchorPos;
     private Vector3 quitAnchorPos;
 
+    [SerializeField] private Image continueAfterDeathPanel;
+    [SerializeField] private TextMeshProUGUI roundScoreContinue;
+    [SerializeField] private RectTransform yesButton;
+    [SerializeField] private RectTransform noButton;
+    [SerializeField] private float closeContinueScreenAfter = 5f;
+    [SerializeField] private Image timerImage;
+    private float currentTimerImageFill = 0;
+
+    private int playerDeaths = 0;
+
     private void OnEnable()
     {
         retryAnchorPos = retryButton.anchoredPosition;
         quitAnchorPos = quitButton.anchoredPosition;
         GameManager.OnGameReset += ResetPanel;
-        PlayerCollision.OnPlayerDeath += ShowDeathPanelAfterDelay;
+        PlayerCollision.OnPlayerDeath += OnPlayerDeath;
     }
 
     private void OnDisable()
     {
         GameManager.OnGameReset -= ResetPanel;
-        PlayerCollision.OnPlayerDeath -= ShowDeathPanelAfterDelay;
+        PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+    }
+
+    private void Update()
+    {
+        if(currentTimerImageFill > 0)
+        {
+            currentTimerImageFill -= Time.deltaTime;
+            timerImage.fillAmount = currentTimerImageFill / closeContinueScreenAfter;
+        }
     }
 
     /// <summary>
@@ -38,6 +58,71 @@ public class PlayerDeathCanvas : MonoBehaviour
     {
         //wait 2 seconds after dying for it to appear
         Invoke(nameof(ShowDeathPanel), 2f);
+    }
+
+    private void OnPlayerDeath()
+    {
+        //if reward ad is ready
+        if(AdManager.Instance.rewardedVideoAd.IsAdReady() && !AdManager.Instance.hasWatchedAdThisRun)
+        {
+            //bring up watch video to continue screen
+            Invoke(nameof(OpenContinueAdPanel), 2f);
+        }
+        else
+        {
+            //no ad ready so just play normal death screen
+            ShowDeathPanelAfterDelay();
+        }
+    }
+
+    private void OpenContinueAdPanel()
+    {
+        //reset panel
+
+        continueAfterDeathPanel.gameObject.SetActive(true);
+
+        // Slide panel in from top fast and fade in background
+        Sequence panelIn = DOTween.Sequence();
+        panelIn.Append(continueAfterDeathPanel.rectTransform.DOAnchorPos(Vector2.zero, 0.25f).SetEase(Ease.OutBack));
+
+        panelIn.AppendCallback(() =>
+        {
+            roundScoreContinue.text = GameManager.Instance.playerScore.ToString();
+            roundScoreContinue.transform.DOScale(1f, .2f);
+            yesButton.gameObject.SetActive(true);
+            noButton.gameObject.SetActive(true);
+            yesButton.DOAnchorPos(retryAnchorPos, .25f).SetEase(Ease.InSine);
+            noButton.DOAnchorPos(quitAnchorPos, .25f).SetEase(Ease.InSine);
+
+            //invoke close timer
+            currentTimerImageFill = closeContinueScreenAfter;
+            Invoke(nameof(CloseContinuePanel), closeContinueScreenAfter);
+        });
+    }
+
+    public void YesButton()
+    {
+        //play add pause game
+        AdManager.Instance.ShowRewarded();
+        CloseContinuePanel();
+        ResetPanel();
+    }
+
+    public void NoButton()
+    {
+        CloseContinuePanel();
+        Invoke(nameof(ShowDeathPanel), 0.25f);
+    }
+
+    private void CloseContinuePanel()
+    {
+        Sequence panelOut = DOTween.Sequence();
+        panelOut.Append(continueAfterDeathPanel.rectTransform.DOAnchorPos(new Vector2(0, 1000), 0.25f).SetEase(Ease.InBack));
+
+        panelOut.AppendCallback(() =>
+        {
+            continueAfterDeathPanel.gameObject.SetActive(false);   
+        });
     }
 
     private void ResetPanel()
@@ -59,6 +144,7 @@ public class PlayerDeathCanvas : MonoBehaviour
     {
         ResetPanel();
         deathPanel.gameObject.SetActive(true);
+        
 
         // Slide panel in from top fast and fade in background
         Sequence panelIn = DOTween.Sequence();
@@ -111,6 +197,7 @@ public class PlayerDeathCanvas : MonoBehaviour
                     retryButton.gameObject.SetActive(true);
                     quitButton.DOAnchorPos(quitAnchorPos, .25f).SetEase(Ease.InSine);
                     retryButton.DOAnchorPos(retryAnchorPos, .25f).SetEase(Ease.InSine);
+                    Invoke(nameof(CheckIfPlayInterstitial), .25f);
                 });
 
             }
@@ -147,10 +234,25 @@ public class PlayerDeathCanvas : MonoBehaviour
                     retryButton.gameObject.SetActive(true);
                     quitButton.DOAnchorPos(quitAnchorPos, .25f).SetEase(Ease.InSine);
                     retryButton.DOAnchorPos(retryAnchorPos, .25f).SetEase(Ease.InSine);
+                    Invoke(nameof(CheckIfPlayInterstitial), .25f);
                 });
             }
         });
         
+    }
+
+    private void CheckIfPlayInterstitial()
+    {
+        //check if should show interstitial ad
+        playerDeaths++;
+        if (playerDeaths % 3 == 0 && playerDeaths != 0)
+        {
+            //player interstitial
+            if(AdManager.Instance.interstitialAd.IsAdReady())
+            {
+                AdManager.Instance.ShowInterstitial();
+            }
+        }
     }
 
     public void CallResetGame()

@@ -33,18 +33,25 @@ public class EnemyCircleManager : MonoBehaviour
     {
         GameManager.OnGameReset += OnGameReset;
         PlayerCollision.OnPlayerDeath += OnPlayerDeath;
+        AdManager.OnPlayerContinueReward += OnPlayerContinueAdReward;
     }
 
     private void OnDisable()
     {
         GameManager.OnGameReset -= OnGameReset;
         PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+        AdManager.OnPlayerContinueReward -= OnPlayerContinueAdReward;
     }
 
     private void OnPlayerDeath()
     {
         StopCircleSpawning();
         StopRandomScreenSpawning();
+    }
+
+    private void OnPlayerContinueAdReward()
+    {
+        StartRandomSpawning();
     }
 
     private void OnGameReset()

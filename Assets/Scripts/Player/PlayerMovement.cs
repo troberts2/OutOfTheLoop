@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -22,12 +23,14 @@ public class PlayerMovement : MonoBehaviour
     {
         PlayerCollision.OnPlayerDeath += OnPlayerDeath;
         GameManager.OnGameReset += OnGameReset;
+        AdManager.OnPlayerContinueReward += OnPlayerContinueAdReward;
     }
 
     private void OnDisable()
     {
         PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
         GameManager.OnGameReset -= OnGameReset;
+        AdManager.OnPlayerContinueReward -= OnPlayerContinueAdReward;
     }
 
     private void OnPlayerDeath()
@@ -41,9 +44,15 @@ public class PlayerMovement : MonoBehaviour
         animator.Rebind();
     }
 
+    private void OnPlayerContinueAdReward()
+    {
+        canMove = true;
+        animator.Rebind();
+    }
+
     void Update()
     {
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         mouseWorldPos.z = transform.position.z; // Maintain original z position
         float distToMouse = Vector2.Distance(transform.position, mouseWorldPos);
 

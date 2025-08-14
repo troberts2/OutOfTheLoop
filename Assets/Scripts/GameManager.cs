@@ -35,18 +35,26 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
         PlayerCollision.OnPlayerDeath += OnPlayerDeath;
+        AdManager.OnPlayerContinueReward += OnPlayerContinueRewardAd;
     }
 
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
         PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+        AdManager.OnPlayerContinueReward -= OnPlayerContinueRewardAd;
     }
 
     private void OnPlayerDeath()
     {
         isGameStarted = false;
         scoreText.enabled = false;
+    }
+
+    private void OnPlayerContinueRewardAd()
+    {
+        isGameStarted=true;
+        scoreText.enabled = true;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)

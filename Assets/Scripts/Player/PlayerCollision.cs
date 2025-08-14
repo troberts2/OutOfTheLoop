@@ -25,11 +25,13 @@ public class PlayerCollision : MonoBehaviour
     {
         boxCollider = GetComponent<BoxCollider2D>();
         GameManager.OnGameReset += OnReset;
+        AdManager.OnPlayerContinueReward += OnReset;
     }
 
     private void OnDisable()
     {
         GameManager.OnGameReset -= OnReset;
+        AdManager.OnPlayerContinueReward -= OnReset;
     }
 
     public void HealPlayer()
@@ -120,7 +122,7 @@ public class PlayerCollision : MonoBehaviour
     private IEnumerator DoFreezeFrame()
     {
         float originalTimeScale = Time.timeScale;
-        Time.timeScale = 0.1f;
+        Time.timeScale = 0.0f;
 
         // Wait in *real* time so it's not affected by timeScale
         yield return new WaitForSecondsRealtime(freezeDuration);

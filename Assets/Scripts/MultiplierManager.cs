@@ -37,6 +37,7 @@ public class MultiplierManager : MonoBehaviour
         GameManager.OnGameReset += OnGameReset;
         SceneManager.sceneLoaded += OnSceneLoaded;
         PlayerCollision.OnPlayerDeath += StopSpawning;
+        AdManager.OnPlayerContinueReward += OnPlayerContinueAdReward;
     }
 
     private void OnDisable()
@@ -44,6 +45,12 @@ public class MultiplierManager : MonoBehaviour
         GameManager.OnGameReset -= OnGameReset;
         SceneManager.sceneLoaded -= OnSceneLoaded;
         PlayerCollision.OnPlayerDeath -= StopSpawning;
+        AdManager.OnPlayerContinueReward -= OnPlayerContinueAdReward;
+    }
+
+    private void OnPlayerContinueAdReward()
+    {
+        StartSpawning();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
