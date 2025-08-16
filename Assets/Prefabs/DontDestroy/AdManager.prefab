@@ -183,7 +183,8 @@ MonoBehaviour:
   adUnitBanner: 266jptcm2tkaaxfr
   adUnitInterstitial: bwel4wx7fs4g0vko
   adUnitRewarded: 20gk4wdr9nlgtw8m
-  adCanvas: {fileID: 695108725375203451}
+  isAdsEnabled: 1
+  hasWatchedAdThisRun: 0
 --- !u!1 &5240049665436748687
 GameObject:
   m_ObjectHideFlags: 0

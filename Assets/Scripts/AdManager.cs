@@ -55,6 +55,10 @@ public class AdManager : MonoBehaviour
         LevelPlay.SetAdaptersDebug(true);
         //LevelPlay.SetMetaData("is_test_suite", "enable");
 
+        LevelPlay.SetMetaData("is_deviceid_optout", "true");
+        LevelPlay.SetMetaData("is_child_directed", "true");
+        LevelPlay.SetMetaData("Google_Family_Self_Certified_SDKS", "true");
+
         LevelPlay.Init(AdConfig.AppKey);
     }
 

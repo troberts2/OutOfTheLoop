@@ -63,7 +63,7 @@ public class PlayerDeathCanvas : MonoBehaviour
     private void OnPlayerDeath()
     {
         //if reward ad is ready
-        if(AdManager.Instance.rewardedVideoAd.IsAdReady() && !AdManager.Instance.hasWatchedAdThisRun)
+        if(AdManager.Instance.rewardedVideoAd.IsAdReady() && !AdManager.Instance.hasWatchedAdThisRun && AdManager.Instance.isAdsEnabled)
         {
             //bring up watch video to continue screen
             Invoke(nameof(OpenContinueAdPanel), 2f);
@@ -248,7 +248,7 @@ public class PlayerDeathCanvas : MonoBehaviour
         if (playerDeaths % 3 == 0 && playerDeaths != 0)
         {
             //player interstitial
-            if(AdManager.Instance.interstitialAd.IsAdReady())
+            if(AdManager.Instance.interstitialAd.IsAdReady() && AdManager.Instance.isAdsEnabled)
             {
                 AdManager.Instance.ShowInterstitial();
             }

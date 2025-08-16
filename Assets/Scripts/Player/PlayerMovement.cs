@@ -50,18 +50,30 @@ public class PlayerMovement : MonoBehaviour
         animator.Rebind();
     }
 
+    Vector3 worldPos;
+
     void Update()
     {
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        mouseWorldPos.z = transform.position.z; // Maintain original z position
-        float distToMouse = Vector2.Distance(transform.position, mouseWorldPos);
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
+        {
+            var touch = Touchscreen.current.primaryTouch.position.ReadValue();
+            worldPos = Camera.main.ScreenToWorldPoint(new Vector3(touch.x, touch.y));
+        }
+        else if (Mouse.current != null)
+        {
+            var mouse = Mouse.current.position.ReadValue();
+            worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mouse.x, mouse.y));
+        }
+
+        worldPos.z = transform.position.z; // Maintain original z position
+        float distToMouse = Vector2.Distance(transform.position, worldPos);
 
         //follow mouse
         if(distToMouse > followRange && canMove)
-            transform.position = Vector3.Lerp(transform.position, mouseWorldPos, followSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, worldPos, followSpeed * Time.deltaTime);
 
         //animations
-        Vector2 moveInput = (mouseWorldPos - transform.position).normalized;
+        Vector2 moveInput = (worldPos - transform.position).normalized;
         animator.SetFloat("Speed", distToMouse);
         animator.SetFloat("MoveX", moveInput.x);
         animator.SetFloat("MoveY", moveInput.y);
