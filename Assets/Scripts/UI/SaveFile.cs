@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public class SettingsData
@@ -8,6 +9,8 @@ public class SettingsData
     public float sfxVolume = .7f;
     public int resolutionIndex = 0;
     public bool isFullscreen = false;
+    public bool isTiltControls = false;
+    public Vector3 calibrationOffset = Vector3.zero;
 }
 
 [System.Serializable]

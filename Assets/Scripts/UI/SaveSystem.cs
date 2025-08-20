@@ -32,7 +32,7 @@ public class SaveSystem : MonoBehaviour
         }
     }
 
-    public void SaveSettings(float master, float music, float sfx, int index, bool fullscreen)
+    public void SaveSettings(float master, float music, float sfx, int index, bool fullscreen, bool isTilt, Vector3 calibrationOff)
     {
         SaveFile saveFile = LoadGame();
 
@@ -42,6 +42,8 @@ public class SaveSystem : MonoBehaviour
         saveFile.settings.sfxVolume = sfx;
         saveFile.settings.resolutionIndex = index;
         saveFile.settings.isFullscreen = fullscreen;
+        saveFile.settings.isTiltControls = isTilt;
+        saveFile.settings.calibrationOffset = calibrationOff;
 
         //actually write and save in json
         string json = JsonUtility.ToJson(saveFile, true); // 'true' for pretty print (optional)

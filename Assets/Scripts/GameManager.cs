@@ -13,8 +13,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Canvas scoreCanvas;
     public MultiplierText multText;
     public bool isGameStarted = false;
+    public bool isTiltControls = false;
 
     public static event Action OnGameReset;
+
+    public Vector3 calibrationOffset;
 
     private void Awake()
     {
@@ -43,6 +46,12 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
         PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
         AdManager.OnPlayerContinueReward -= OnPlayerContinueRewardAd;
+    }
+
+    private void Start()
+    {
+        SaveFile save = SaveSystem.Instance.LoadGame();
+        isTiltControls = save.settings.isTiltControls;
     }
 
     private void OnPlayerDeath()

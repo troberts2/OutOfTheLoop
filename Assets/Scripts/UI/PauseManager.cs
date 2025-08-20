@@ -20,6 +20,7 @@ public class PauseManager : MonoBehaviour
     [Header("Pause Menu")]
     [SerializeField] private RectTransform pausePanel;
     [SerializeField] private CanvasGroup pauseGroup;
+    [SerializeField] private GameObject pauseButton;
 
     [Header("Options Menu")]
     [SerializeField] private RectTransform optionsPanel;
@@ -42,6 +43,28 @@ public class PauseManager : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         pauseCanvas.worldCamera = Camera.main;
+        if(scene.name == "MainMenu")
+        {
+            pauseButton.SetActive(false);
+        }
+    }
+
+    void OnPlayerDeath()
+    {
+        pauseButton.SetActive(false);
+    }
+
+    void OnGameReset()
+    {
+        if(SceneManager.GetActiveScene().name == "GameScene")
+        {
+            Invoke(nameof(EnablePauseButton), 3f);
+        }
+    }
+
+    private void EnablePauseButton()
+    {
+        pauseButton.SetActive(true);
     }
 
     private void OnEnable()
@@ -52,6 +75,9 @@ public class PauseManager : MonoBehaviour
         pauseBack.Enable();
 
         SceneManager.sceneLoaded += OnSceneLoaded;
+        PlayerCollision.OnPlayerDeath += OnPlayerDeath;
+        GameManager.OnGameReset += OnGameReset;
+        AdManager.OnPlayerContinueReward += EnablePauseButton;
     }
 
     private void OnDisable()
@@ -63,6 +89,9 @@ public class PauseManager : MonoBehaviour
         }
 
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+        GameManager.OnGameReset -= OnGameReset;
+        AdManager.OnPlayerContinueReward -= EnablePauseButton;
     }
 
     public void OnWebGLBlur()
@@ -122,10 +151,11 @@ public class PauseManager : MonoBehaviour
         
     }
 
-    private void OpenPauseMenu()
+    public void OpenPauseMenu()
     {
         Time.timeScale = 0f;
         pausePanel.gameObject.SetActive(true);
+        pauseButton.SetActive(false);
         isPaused = true;
         pausePanel.anchoredPosition = new Vector2(0, 1000);
         pauseGroup.alpha = 0.0f;
@@ -137,6 +167,7 @@ public class PauseManager : MonoBehaviour
     public void ClosePauseMenu()
     {
         Time.timeScale = 1;
+        pauseButton.SetActive(true);
         isPaused = false;
         pausePanel.anchoredPosition = new Vector2(0, 0);
         pauseGroup.alpha = 1.0f;

@@ -1,14 +1,20 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class OptionsSettings : MonoBehaviour
 {
     [SerializeField] private TMP_Dropdown resDropDown;
     [SerializeField] private Toggle fullscreenToggle;
+    [SerializeField] private Toggle tiltControlsToggle;
+
+    [Header("Calibration")]
+    [SerializeField] private RectTransform calibrationPanel;
 
     bool isFullscreen;
     int selectedResolution;
@@ -50,6 +56,8 @@ public class OptionsSettings : MonoBehaviour
         LoadMasterVolume(save);
         LoadMusicVolume(save);
         LoadSfxVolume(save);
+
+        tiltControlsToggle.isOn = save.settings.isTiltControls;
 
 #if UNITY_WEBGL
         //set resolution to 1280x720 for webGL window. Player cannot fullscreen or change res
@@ -93,6 +101,36 @@ public class OptionsSettings : MonoBehaviour
         Screen.SetResolution(selectedResolutionList[selectedResolution].width, selectedResolutionList[selectedResolution].height, isFullscreen);
     }
 
+    public void ChangeIsTiltControls()
+    {
+        GameManager.Instance.isTiltControls = tiltControlsToggle.isOn;
+        if(tiltControlsToggle.isOn)
+        {
+            OpenCalibrateScreen();
+        }
+    }
+
+    private void OpenCalibrateScreen()
+    {
+        calibrationPanel.anchoredPosition = new Vector2(0, 1000);
+        calibrationPanel.DOAnchorPosY(0, 0.2f).SetEase(Ease.InBack).SetUpdate(true);
+    }
+
+    private void CloseCalibrateScreen()
+    {
+        calibrationPanel.anchoredPosition = Vector2.zero;
+        calibrationPanel.DOAnchorPosY(1000, 0.2f).SetEase(Ease.OutBack).SetUpdate(true);
+    }
+
+    public void Calibrate()
+    {
+        if (Accelerometer.current != null)
+        {
+            GameManager.Instance.calibrationOffset = Accelerometer.current.acceleration.ReadValue();
+        }
+        CloseCalibrateScreen();
+    }
+
     public void SetSavedResolution(SaveFile save)
     {
         int resIndex = save.settings.resolutionIndex;
@@ -105,7 +143,13 @@ public class OptionsSettings : MonoBehaviour
 
     private void SaveSettings()
     {
-        SaveSystem.Instance.SaveSettings(masterSlider.value, musicSlider.value, sfxSlider.value, selectedResolution, isFullscreen);
+        SaveSystem.Instance.SaveSettings(masterSlider.value, 
+            musicSlider.value, 
+            sfxSlider.value, 
+            selectedResolution, 
+            isFullscreen, 
+            GameManager.Instance.isTiltControls, 
+            GameManager.Instance.calibrationOffset);
     }
 
     #region Sound Settings

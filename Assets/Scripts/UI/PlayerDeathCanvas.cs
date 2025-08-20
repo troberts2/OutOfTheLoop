@@ -97,6 +97,7 @@ public class PlayerDeathCanvas : MonoBehaviour
             //invoke close timer
             currentTimerImageFill = closeContinueScreenAfter;
             Invoke(nameof(CloseContinuePanel), closeContinueScreenAfter);
+            Invoke(nameof(ShowDeathPanel), closeContinueScreenAfter);
         });
     }
 
@@ -111,6 +112,7 @@ public class PlayerDeathCanvas : MonoBehaviour
     public void NoButton()
     {
         CloseContinuePanel();
+        CancelInvoke(nameof(ShowDeathPanel));
         Invoke(nameof(ShowDeathPanel), 0.25f);
     }
 
@@ -142,6 +144,8 @@ public class PlayerDeathCanvas : MonoBehaviour
 
     private void ShowDeathPanel()
     {
+        if (deathPanel.gameObject.activeInHierarchy) return;
+
         ResetPanel();
         deathPanel.gameObject.SetActive(true);
         
