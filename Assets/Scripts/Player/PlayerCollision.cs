@@ -18,6 +18,9 @@ public class PlayerCollision : MonoBehaviour
     [SerializeField] private AudioClip multiplierPickup;
     private BoxCollider2D boxCollider;
 
+    private Camera mainCam;
+    [SerializeField] private Canvas playerUICanvas;
+
     public static event Action OnPlayerDeath;
     public static event Action OnPlayerHurt;
 
@@ -26,12 +29,20 @@ public class PlayerCollision : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
         GameManager.OnGameReset += OnReset;
         AdManager.OnPlayerContinueReward += OnReset;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         GameManager.OnGameReset -= OnReset;
         AdManager.OnPlayerContinueReward -= OnReset;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
+    {
+        mainCam = Camera.main;
+        playerUICanvas.worldCamera = mainCam;
     }
 
     public void HealPlayer()

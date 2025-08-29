@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
-using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerDeathCanvas : MonoBehaviour
 {
@@ -106,6 +105,7 @@ public class PlayerDeathCanvas : MonoBehaviour
         //play add pause game
         AdManager.Instance.ShowRewarded();
         CloseContinuePanel();
+        CancelInvoke(nameof(ShowDeathPanel));
         ResetPanel();
     }
 

@@ -5,12 +5,20 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 {
     private RectTransform bg;
     private RectTransform handle;
+    private CanvasGroup canvasGroup; // for hiding/showing
     private Vector2 inputVector;
 
     void Start()
     {
-        bg = GetComponent<RectTransform>();
-        handle = transform.GetChild(0).GetComponent<RectTransform>();
+        bg = transform.GetChild(0).GetComponent<RectTransform>();
+        handle = transform.GetChild(0).GetChild(0).GetComponent<RectTransform>();
+
+        // Add or get CanvasGroup for fading
+        canvasGroup = bg.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = bg.gameObject.AddComponent<CanvasGroup>();
+
+        HideJoystick();
     }
 
     private void OnEnable()
@@ -27,6 +35,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
     {
         inputVector = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
+        HideJoystick();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -48,12 +57,35 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
         }
     }
 
-    public void OnPointerDown(PointerEventData eventData) => OnDrag(eventData);
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        // Reposition joystick at touch point
+        Vector2 localPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            bg.parent as RectTransform, eventData.position, eventData.pressEventCamera, out localPos);
+        bg.anchoredPosition = localPos;
+
+        ShowJoystick();
+        OnDrag(eventData);
+    }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         inputVector = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
+        HideJoystick();
+    }
+
+    private void ShowJoystick()
+    {
+        canvasGroup.alpha = 0.6f;
+        canvasGroup.blocksRaycasts = true;
+    }
+
+    private void HideJoystick()
+    {
+        canvasGroup.alpha = 0f;
+        canvasGroup.blocksRaycasts = false;
     }
 
     public Vector2 GetInput() => inputVector;

@@ -12,6 +12,8 @@ public class EnemyCircleManager : MonoBehaviour
     [SerializeField] private float startInterval = 0.5f;
     [SerializeField] private float endInterval = 0.1f;
     [SerializeField] private float difficultyRampTime = 45f; // seconds to reach max difficulty
+    [SerializeField] private float endInterval2 = 0.05f;
+    [SerializeField] private float difficultyRampTime2 = 30f;
     private float elapsedTime = 0;
     private float currentInterval;
     private float t = 0;
@@ -157,9 +159,16 @@ public class EnemyCircleManager : MonoBehaviour
         if(GameManager.Instance.isGameStarted)
         {
             elapsedTime += Time.deltaTime;
-
-            t = Mathf.Clamp01(elapsedTime / difficultyRampTime);
-            currentInterval = Mathf.Lerp(startInterval, endInterval, t);
+            if (elapsedTime <= difficultyRampTime)
+            {
+                t = Mathf.Clamp01(elapsedTime / difficultyRampTime);
+                currentInterval = Mathf.Lerp(startInterval, endInterval, t);
+            }
+            else if(elapsedTime - difficultyRampTime <= difficultyRampTime2)
+            {
+                t = Mathf.Clamp01((elapsedTime - difficultyRampTime) / difficultyRampTime2);
+                currentInterval = Mathf.Lerp(endInterval, endInterval2, t);
+            }
         }
     }
 }

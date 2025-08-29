@@ -11,6 +11,7 @@ public class SettingsData
     public bool isFullscreen = false;
     public bool isTiltControls = false;
     public Vector3 calibrationOffset = Vector3.zero;
+    public bool hasPlayedBefore = false;
 }
 
 [System.Serializable]
