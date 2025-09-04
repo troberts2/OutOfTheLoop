@@ -21,6 +21,12 @@ public class PlayerCollision : MonoBehaviour
     private Camera mainCam;
     [SerializeField] private Canvas playerUICanvas;
 
+    [SerializeField] private float iFrameDuration = 2f;
+    [SerializeField] private float blinkInterval = 0.2f;
+
+    private bool isInvincible = false;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+
     public static event Action OnPlayerDeath;
     public static event Action OnPlayerHurt;
 
@@ -58,6 +64,11 @@ public class PlayerCollision : MonoBehaviour
 
     public void TakeDamage()
     {
+        if (isInvincible)
+        {
+            return;
+        }
+
         OnPlayerHurt?.Invoke();
         currentHealth--;
 
@@ -73,6 +84,8 @@ public class PlayerCollision : MonoBehaviour
         TriggerHitStop();
         PixelPerfectShake.Instance.Shake();
         animator.SetTrigger("takeHit");
+        // Trigger iFrames
+        StartCoroutine(IFrames());
     }
 
     private void UpdateHeartUI()
@@ -149,6 +162,40 @@ public class PlayerCollision : MonoBehaviour
             ParticleSystemPool.Instance.PlayMultiplierParticleSystem(collision.transform.position);
             AudioManager.Instance.PlaySound(multiplierPickup);
             collision.GetComponent<Multiplier>().TurnOff();
+
+            if(SceneManager.GetActiveScene().name == "Tutorial")
+            {
+                FindAnyObjectByType<TutorialManager>().multipliersCollected++;
+            }
+
+            GetComponentInChildren<MultiplierPointer>().target = null;
         }
+    }
+
+    private IEnumerator IFrames()
+    {
+        isInvincible = true;
+
+        float elapsed = 0f;
+
+        while (elapsed < iFrameDuration)
+        {
+            // How far through the i-frames we are
+            float t = elapsed / iFrameDuration;
+
+            // Blink speed ramps up as we approach the end
+            float currentBlinkInterval = Mathf.Lerp(blinkInterval * 2f, blinkInterval * 0.25f, t);
+
+            // Toggle visibility
+            spriteRenderer.enabled = !spriteRenderer.enabled;
+
+            yield return new WaitForSeconds(currentBlinkInterval);
+            elapsed += currentBlinkInterval;
+        }
+
+        // Make sure sprite is visible again
+        spriteRenderer.enabled = true;
+
+        isInvincible = false;
     }
 }

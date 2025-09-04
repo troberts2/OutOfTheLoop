@@ -26,6 +26,9 @@ public class BasicEnemyCircle : MonoBehaviour
 
     private bool hasDamagedPlayer = false;
 
+    private WaitForFixedUpdate waitForFixedUpdate;
+    private bool shouldCheck = false;
+
     private Color[] rainbowColors = new Color[]
     {
         Color.red,
@@ -57,6 +60,39 @@ public class BasicEnemyCircle : MonoBehaviour
         spriteMaterialInstance = new Material(baseCircle.material);
         baseCircle.material = spriteMaterialInstance;
         spriteMaterialInstance.SetColor("_Color", baseCircle.color * 3.4f);
+        waitForFixedUpdate = new WaitForFixedUpdate();
+    }
+
+    private void FixedUpdate()
+    {
+        if(shouldCheck)
+        {
+            // world position of the circle collider
+            Vector2 worldPos = (Vector2)circleCollider.transform.position + circleCollider.offset;
+
+            // radius in world units (scale matters!)
+            float worldRadius = circleCollider.radius * circleCollider.transform.lossyScale.x;
+
+            // perform overlap
+            Collider2D hit = Physics2D.OverlapCircle(worldPos, worldRadius, playerLayer);
+
+            if (hit != null)
+            {
+                if (hit.CompareTag("Player"))
+                {
+                    if (isHealCircle)
+                    {
+                        hit.GetComponent<PlayerCollision>().HealPlayer();
+                    }
+                    else
+                    {
+                        hit.GetComponent<PlayerCollision>().TakeDamage();
+                    }
+                    HasDamagedPlayer = true;
+                }
+            }
+            shouldCheck = false;
+        }
     }
 
     private void OnSceneUnloaded(Scene scene)
@@ -64,17 +100,22 @@ public class BasicEnemyCircle : MonoBehaviour
         OnGameReset();
     }
 
-    public void ActivateDeathCircle()
+    public void ActivateDeathCircle(bool forceDamageCircle, bool isTutorialHeal = false)
     {
 
         float random = Random.Range(0f, 100f);
 
-        if(random < 5f)
+        if(forceDamageCircle)
+        {
+            isHealCircle = false;
+        }
+        else if(random < 5f || isTutorialHeal)
         {
             //5% chance spawn heal circle
             isHealCircle = true;
         }
         scaleDuration = Random.Range(scaleDurationMinimum, scaleDurationMaximum);
+        circleCollider.enabled = true;
         StartRandomRainbowLoop();
         GrowIndicator();
 
@@ -105,32 +146,7 @@ public class BasicEnemyCircle : MonoBehaviour
 
     private void ActivateColliderAndDie()
     {
-        circleCollider.enabled = true;
-
-        // Manually check if overlapping player immediately
-        ContactFilter2D filter = new ContactFilter2D();
-        filter.SetLayerMask(playerLayer);
-        filter.useTriggers = true;
-
-        Collider2D[] results = new Collider2D[5];
-        if (circleCollider.OverlapCollider(filter, results) > 0)
-        {
-            foreach (var col in results)
-            {
-                if (col != null && col.CompareTag("Player"))
-                {
-                    if(isHealCircle)
-                    {
-                        col.GetComponent<PlayerCollision>().HealPlayer();
-                    }
-                    else
-                    {
-                        col.GetComponent<PlayerCollision>().TakeDamage();
-                    }
-                    HasDamagedPlayer = true;
-                }
-            }
-        }
+        shouldCheck = true;
 
         GameManager.Instance.AddToScore();
         if(SceneManager.GetActiveScene().name == "GameScene" && GameManager.Instance.isGameStarted)
@@ -223,7 +239,39 @@ public class BasicEnemyCircle : MonoBehaviour
 
         indicatorCircle.GetComponent<SpriteRenderer>().color = Color.red;
         isHealCircle = false;
+        shouldCheck = false;
 
         gameObject.SetActive(false);
     }
+
+    #region Tutorial
+
+    public void ActivateDeathCircleTutorial()
+    {
+        scaleDuration = 3f;
+        circleCollider.enabled = true;
+        StartRandomRainbowLoop();
+        indicatorCircle.DOScale(0.7f, scaleDuration);
+    }
+
+    public void FinishDeathCircleTutorial()
+    {
+        scaleDuration = 1f;
+        indicatorCircle.DOScale(1f, scaleDuration);
+
+        Invoke(nameof(TurnRed), scaleDuration - turnRedDuration);
+        Invoke(nameof(ActivateColliderAndDie), scaleDuration);
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (SceneManager.GetActiveScene().name != "Tutorial") return;
+
+        if(other.CompareTag("Player"))
+        {
+            FindAnyObjectByType<TutorialManager>().hasExited = true;
+        }
+    }
+
+    #endregion
 }

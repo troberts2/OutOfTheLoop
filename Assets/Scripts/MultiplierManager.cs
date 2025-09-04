@@ -16,6 +16,7 @@ public class MultiplierManager : MonoBehaviour
     private Coroutine spawnRoutine;
     [SerializeField] private float spawnInterval = 5f;
     private Camera mainCam;
+    public MultiplierPointer multiplierPointer;
 
     private void Awake()
     {
@@ -56,6 +57,10 @@ public class MultiplierManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         mainCam = Camera.main;
+        if(scene.name == "Tutorial" || scene.name == "GameScene")
+        {
+            multiplierPointer = FindAnyObjectByType<MultiplierPointer>();
+        }
     }
 
     private void OnGameReset()
@@ -74,7 +79,7 @@ public class MultiplierManager : MonoBehaviour
         for (int i = 0; i < poolSize; i++)
         {
             Multiplier m = Instantiate(multiplier, transform);
-            m.TurnOff(); // optional: deactivate until used
+            m.TurnOff(true); // optional: deactivate until used
             multipliers.Add(m);
         }
     }
@@ -96,6 +101,7 @@ public class MultiplierManager : MonoBehaviour
         Multiplier m = GetAvailableSource();
         m.transform.position = position;
         m.TurnOn();
+        multiplierPointer.target = m.transform;
     }
 
     public void StartSpawning()
@@ -125,6 +131,11 @@ public class MultiplierManager : MonoBehaviour
                 Random.Range(0f, Screen.height),
                 0f
             );
+
+            if(mainCam ==null)
+            {
+                mainCam = Camera.main;
+            }
 
             Vector3 worldPos = mainCam.ScreenToWorldPoint(screenPos);
             worldPos.z = 0f;

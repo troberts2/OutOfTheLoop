@@ -35,12 +35,22 @@ public class MultiplierText : MonoBehaviour
 
     private void OnEnable()
     {
-        PlayerCollision.OnPlayerHurt += DisableMultiplier;
+        PlayerCollision.OnPlayerHurt += HalfMultiplier;
+        PlayerCollision.OnPlayerDeath += OnGameReset;
+        GameManager.OnGameReset += OnGameReset;
     }
 
     private void OnDisable()
     {
-        PlayerCollision.OnPlayerHurt -= DisableMultiplier;
+        PlayerCollision.OnPlayerHurt -= HalfMultiplier;
+        PlayerCollision.OnPlayerDeath -= OnGameReset;
+        GameManager.OnGameReset -= OnGameReset;
+    }
+
+    private void OnGameReset()
+    {
+        currentMultiplier = 1;
+        DisableMultiplier();
     }
 
     public void SetMultiplier(int multiplier)
@@ -59,16 +69,36 @@ public class MultiplierText : MonoBehaviour
         }
         else
         {
-            ShakeMultiplier();
+            ShakeMultiplier(true);
         }
 
         currentMultiplier = Mathf.Min(currentMultiplier * multiplier, maxMultiple);
+    }
+
+    private void HalfMultiplier()
+    {
+        if(currentMultiplier > 1)
+        {
+            currentMultiplier /= 2;
+        }
+
+        multiplierText.text = "x" + currentMultiplier.ToString();
+
+        if (currentMultiplier <= 1)
+        {
+            DisableMultiplier();
+        }
+        else
+        {
+            ShakeMultiplier(false);
+        }
     }
 
     private void ShowMultiplier()
     {
         multiplierText.enabled = true ;
         multiplierText.transform.localScale = Vector3.zero;
+        multiplierText.color = Color.yellow;
 
         KillTweens();
 
@@ -82,11 +112,19 @@ public class MultiplierText : MonoBehaviour
             });
     }
 
-    private void ShakeMultiplier()
+    private void ShakeMultiplier(bool isGood)
     {
         KillTweens();
 
-        multiplierText.DOColor(Color.white, shakeDuration);
+        if(isGood)
+        {
+            multiplierText.DOColor(Color.white, shakeDuration);
+        }
+        else
+        {
+            multiplierText.DOColor(Color.red, shakeDuration);
+        }    
+        
         activeTween = multiplierText.transform
             .DOShakeRotation(shakeDuration, new Vector3(0, 0, shakeStrength), shakeVibrato, 90, false)
             .OnComplete(() =>
@@ -99,11 +137,9 @@ public class MultiplierText : MonoBehaviour
 
     public void DisableMultiplier()
     {
-        if (currentMultiplier <= 1)
-            return;
-
         KillTweens();
 
+        multiplierText.DOColor(Color.red, popDuration);
         activeTween = multiplierText.transform
             .DOScale(Vector3.zero, popDuration)
             .SetEase(Ease.InBack)

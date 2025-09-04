@@ -59,6 +59,11 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if(GameManager.Instance.movementType != MovementType.JoyStick)
+        {
+            return;
+        }
+
         // Reposition joystick at touch point
         Vector2 localPos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -71,6 +76,11 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (GameManager.Instance.movementType != MovementType.JoyStick)
+        {
+            return;
+        }
+
         inputVector = Vector2.zero;
         handle.anchoredPosition = Vector2.zero;
         HideJoystick();

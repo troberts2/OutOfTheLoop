@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b106519fb200fa94a8513fb9d9b3906b, type: 3}
+  m_Name: topHat
+  m_EditorClassIdentifier: 
+  hatName: Top Hat
+  type: 0
+  sprites:
+    up: {fileID: 1653084020, guid: bd943f3b96bab514facdc178fe69f929, type: 3}
+    down: {fileID: 781257205, guid: bd943f3b96bab514facdc178fe69f929, type: 3}
+    left: {fileID: 1746823477, guid: bd943f3b96bab514facdc178fe69f929, type: 3}
+    right: {fileID: -2141174236, guid: bd943f3b96bab514facdc178fe69f929, type: 3}
+  animations:
+    up: {fileID: 0}
+    down: {fileID: 0}
+    left: {fileID: 0}
+    right: {fileID: 0}

@@ -20,6 +20,18 @@ public class MainMenu : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    private void Start()
+    {
+        SaveFile save = SaveSystem.Instance.LoadGame();
+        if (!save.settings.hasPlayedBefore)
+        {
+
+            //if first time playing load tutorial
+            SaveSystem.Instance.SaveHasPlayedBefore();
+            SceneManager.LoadScene("Tutorial");
+        }
+    }
+
     /// <summary>
     /// called when play button on main menu is clicked
     /// </summary>
@@ -44,6 +56,13 @@ public class MainMenu : MonoBehaviour
     public void Quit()
     {
         Application.Quit();
+    }
+
+    public void TutorialScene()
+    {
+        EventSystem.current.enabled = false;
+        SceneManager.LoadScene("Tutorial");
+        GameManager.Instance.ResetGame();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

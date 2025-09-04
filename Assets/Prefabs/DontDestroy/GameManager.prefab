@@ -51,6 +51,8 @@ MonoBehaviour:
   scoreCanvas: {fileID: 1469681042452000671}
   multText: {fileID: 4392998505314213539}
   isGameStarted: 0
+  movementType: 0
+  calibrationOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &2918542099750209544
 MonoBehaviour:
   m_ObjectHideFlags: 0

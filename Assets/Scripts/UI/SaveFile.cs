@@ -9,8 +9,8 @@ public class SettingsData
     public float sfxVolume = .7f;
     public int resolutionIndex = 0;
     public bool isFullscreen = false;
-    public bool isTiltControls = false;
     public Vector3 calibrationOffset = Vector3.zero;
+    public MovementType currentMovementType = MovementType.FingerFollow;
     public bool hasPlayedBefore = false;
 }
 
@@ -25,4 +25,11 @@ public class SaveFile
 {
     public SettingsData settings = new SettingsData();
     public HighScoreData highscoreData = new HighScoreData();
+}
+
+public enum MovementType
+{
+    FingerFollow,
+    JoyStick,
+    Tilt
 }

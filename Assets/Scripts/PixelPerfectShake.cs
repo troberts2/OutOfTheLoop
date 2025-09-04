@@ -51,6 +51,8 @@ public class PixelPerfectShake : MonoBehaviour
 
     void LateUpdate()
     {
+        if (mainCam == null) return;
+
         if (shakeTimer > 0)
         {
             shakeTimer -= Time.unscaledDeltaTime;

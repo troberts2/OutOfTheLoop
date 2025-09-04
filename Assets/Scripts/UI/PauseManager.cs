@@ -47,6 +47,14 @@ public class PauseManager : MonoBehaviour
         {
             pauseButton.SetActive(false);
         }
+        if(scene.name == "Tutorial")
+        {
+            pauseButton.SetActive(true);
+        }
+        if(scene.name == "GameScene")
+        {
+            pauseButton.SetActive(false);
+        }
     }
 
     void OnPlayerDeath()
@@ -105,6 +113,24 @@ public class PauseManager : MonoBehaviour
 
                 //bring up pause menu
                 OpenPauseMenu();
+            }
+        }
+    }
+
+    public void OnApplicationPause(bool pause)
+    {
+        if(pause)
+        {
+            if(!isPaused)
+            {
+                if(SceneManager.GetActiveScene().name == "GameScene" || SceneManager.GetActiveScene().name == "Tutorial")
+                {
+                    //start pause and call OnPause functions from other scripts
+                    OnPause?.Invoke();
+
+                    //bring up pause menu
+                    OpenPauseMenu();
+                }
             }
         }
     }

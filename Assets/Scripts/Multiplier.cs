@@ -19,13 +19,18 @@ public class Multiplier : MonoBehaviour
 
     private void OnEnable()
     {
-        PlayerCollision.OnPlayerDeath += TurnOff;
+        PlayerCollision.OnPlayerDeath += OnPlayerDeath;
     }
 
     private void OnDisable()
     {
         floatTween.Kill();
-        PlayerCollision.OnPlayerDeath -= TurnOff;
+        PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+    }
+
+    private void OnPlayerDeath()
+    {
+        TurnOff();
     }
 
 
@@ -35,26 +40,29 @@ public class Multiplier : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
     }
 
-    public void TurnOn()
+    public void TurnOn(bool isTutorial = false)
     {
         boxCollider.enabled = true;
         spriteRenderer.enabled = true;
         IsActive = true;
-        FloatTween();
+        FloatTween(isTutorial);
         StartRainbow();
         Color nextColor = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 3.4f);
         spriteRenderer.color = nextColor;
     }
 
-    private void FloatTween()
+    private void FloatTween(bool isTutorial)
     {
         // Floating animation (yoyo loop forever)
         floatTween = transform.DOMoveY(transform.position.y + floatDistance, floatDuration)
             .SetEase(Ease.InOutSine)
             .SetLoops(-1, LoopType.Yoyo);
 
-        // Schedule fade out after lifetime
-        Invoke(nameof(StartFadeOut), lifetime);
+        if(!isTutorial)
+        {
+            // Schedule fade out after lifetime
+            Invoke(nameof(StartFadeOut), lifetime);
+        }
     }
 
     private void StartFadeOut()
@@ -67,11 +75,11 @@ public class Multiplier : MonoBehaviour
             .SetEase(Ease.Linear)
             .OnComplete(() =>
             {
-                TurnOff() ;
+                TurnOff(false) ;
             });
     }
 
-    public void TurnOff()
+    public void TurnOff(bool firstTurnOff = false)
     {
         spriteRenderer.enabled = false;
         boxCollider.enabled = false;

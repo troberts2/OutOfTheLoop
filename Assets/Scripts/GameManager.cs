@@ -8,12 +8,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public int playerScore = 0;
-    [SerializeField] private TextMeshProUGUI scoreText;
+    public TextMeshProUGUI scoreText;
     private Vector3 originalScale;
     [SerializeField] private Canvas scoreCanvas;
     public MultiplierText multText;
     public bool isGameStarted = false;
-    public bool isTiltControls = false;
+    public MovementType movementType;
 
     public static event Action OnGameReset;
 
@@ -32,6 +32,8 @@ public class GameManager : MonoBehaviour
         }
 
         originalScale = scoreText.transform.localScale;
+        // Prevents the device from sleeping
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     private void OnEnable()
@@ -48,10 +50,16 @@ public class GameManager : MonoBehaviour
         AdManager.OnPlayerContinueReward -= OnPlayerContinueRewardAd;
     }
 
+    private void OnDestroy()
+    {
+        // Restore default when the game closes/destroys this object
+        Screen.sleepTimeout = SleepTimeout.SystemSetting;
+    }
+
     private void Start()
     {
         SaveFile save = SaveSystem.Instance.LoadGame();
-        isTiltControls = save.settings.isTiltControls;
+        movementType = save.settings.currentMovementType;
     }
 
     private void OnPlayerDeath()
@@ -94,7 +102,7 @@ public class GameManager : MonoBehaviour
 
     public void AddToScore()
     {
-        if (!isGameStarted) return;
+        if (!isGameStarted && SceneManager.GetActiveScene().name != "Tutorial") return;
 
         playerScore+= 10 * multText.currentMultiplier;
         scoreText.text = playerScore.ToString();

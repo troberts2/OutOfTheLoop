@@ -74,7 +74,7 @@ public class EnemyPool : MonoBehaviour
         BasicEnemyCircle enemy = GetAvailableSource(random);
         enemy.transform.position = position;
         enemy.gameObject.SetActive(true);
-        enemy.ActivateDeathCircle();
+        enemy.ActivateDeathCircle(false);
 
     }
 }

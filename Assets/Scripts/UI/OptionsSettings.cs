@@ -11,7 +11,7 @@ public class OptionsSettings : MonoBehaviour
 {
     [SerializeField] private TMP_Dropdown resDropDown;
     [SerializeField] private Toggle fullscreenToggle;
-    [SerializeField] private Toggle tiltControlsToggle;
+    [SerializeField] private TMP_Dropdown movementDropdown;
 
     [Header("Calibration")]
     [SerializeField] private RectTransform calibrationPanel;
@@ -57,7 +57,7 @@ public class OptionsSettings : MonoBehaviour
         LoadMusicVolume(save);
         LoadSfxVolume(save);
 
-        tiltControlsToggle.isOn = save.settings.isTiltControls;
+        movementDropdown.value = (int)save.settings.currentMovementType;
 
 #if UNITY_WEBGL
         //set resolution to 1280x720 for webGL window. Player cannot fullscreen or change res
@@ -101,10 +101,10 @@ public class OptionsSettings : MonoBehaviour
         Screen.SetResolution(selectedResolutionList[selectedResolution].width, selectedResolutionList[selectedResolution].height, isFullscreen);
     }
 
-    public void ChangeIsTiltControls()
+    public void ChangeMovementType()
     {
-        GameManager.Instance.isTiltControls = tiltControlsToggle.isOn;
-        if(tiltControlsToggle.isOn)
+        GameManager.Instance.movementType = (MovementType)movementDropdown.value;
+        if(movementDropdown.value == 2)
         {
             OpenCalibrateScreen();
         }
@@ -148,8 +148,9 @@ public class OptionsSettings : MonoBehaviour
             sfxSlider.value, 
             selectedResolution, 
             isFullscreen, 
-            GameManager.Instance.isTiltControls, 
-            GameManager.Instance.calibrationOffset);
+            GameManager.Instance.calibrationOffset,
+            (MovementType)movementDropdown.value
+            );
     }
 
     #region Sound Settings
