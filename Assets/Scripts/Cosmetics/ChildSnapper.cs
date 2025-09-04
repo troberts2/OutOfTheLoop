@@ -16,10 +16,5 @@ public class ChildSnapper : MonoBehaviour
             childObject.localPosition = offset;
         }
     }
-
-    public void DebugAnim()
-    {
-        Debug.Log("hit");
-    }
 }
 
