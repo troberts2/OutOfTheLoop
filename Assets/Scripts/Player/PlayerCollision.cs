@@ -69,7 +69,6 @@ public class PlayerCollision : MonoBehaviour
             return;
         }
 
-        OnPlayerHurt?.Invoke();
         currentHealth--;
 
         UpdateHeartUI();
@@ -80,10 +79,10 @@ public class PlayerCollision : MonoBehaviour
             return;
         }
 
+        OnPlayerHurt?.Invoke();
         AudioManager.Instance.PlaySound(playerHurt);
         TriggerHitStop();
         PixelPerfectShake.Instance.Shake();
-        animator.SetTrigger("takeHit");
         // Trigger iFrames
         StartCoroutine(IFrames());
     }
@@ -122,7 +121,6 @@ public class PlayerCollision : MonoBehaviour
     {
         TriggerHitStop();
         PixelPerfectShake.Instance.Shake();
-        animator.SetTrigger("die");
         AudioManager.Instance.PlaySound(death);
         boxCollider.enabled = false;
         OnPlayerDeath?.Invoke();

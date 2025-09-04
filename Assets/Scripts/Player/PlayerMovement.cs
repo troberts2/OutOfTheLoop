@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float followSpeed = 5f;
     [SerializeField] private float followRange = .1f;
     [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
     private Vector2 minBounds;
     private Vector2 maxBounds;
     [SerializeField] private float padding = 0.5f; // Offset if your sprite has width/height
@@ -18,6 +20,18 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool isTiltControl = true;
     private Rigidbody2D rb;
     private CosmeticManager cosmeticManager;
+
+    private int _currentState;
+
+    private static readonly int Idle = Animator.StringToHash("Idle");
+    private static readonly int Walk = Animator.StringToHash("Walk");
+    private static readonly int TakeHit = Animator.StringToHash("TakeHit");
+    [SerializeField] private float _takeHitDuration = .25f;
+    private static readonly int Die = Animator.StringToHash("die");
+    private float _lockedTill;
+    private bool _takeHit;
+    private bool _die;
+    private bool isMoving;
 
     private void Start()
     {
@@ -29,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     private void OnEnable()
     {
         PlayerCollision.OnPlayerDeath += OnPlayerDeath;
+        PlayerCollision.OnPlayerHurt += OnPlayerHurt;
         GameManager.OnGameReset += OnGameReset;
         AdManager.OnPlayerContinueReward += OnPlayerContinueAdReward;
 
@@ -43,22 +58,31 @@ public class PlayerMovement : MonoBehaviour
     private void OnDisable()
     {
         PlayerCollision.OnPlayerDeath -= OnPlayerDeath;
+        PlayerCollision.OnPlayerHurt -= OnPlayerHurt;
         GameManager.OnGameReset -= OnGameReset;
         AdManager.OnPlayerContinueReward -= OnPlayerContinueAdReward;
 
         EnhancedTouchSupport.Disable();
     }
 
+    private void OnPlayerHurt()
+    {
+        _takeHit = true;
+    }
+
     private void OnPlayerDeath()
     {
         canMove = false;
         playerJoystick.gameObject.SetActive(false);
+        //anim
+        _die = true;
     }
 
     private void OnGameReset()
     {
         canMove = true;
         animator.Rebind();
+        _lockedTill = Time.time;
         playerJoystick.gameObject.SetActive(true);
     }
 
@@ -67,6 +91,56 @@ public class PlayerMovement : MonoBehaviour
         canMove = true;
         animator.Rebind();
         playerJoystick.gameObject.SetActive(true);
+    }
+
+    private void Update()
+    {
+        if (moveInput.x != 0)
+        {
+            spriteRenderer.flipX = moveInput.x < 0;
+        }
+
+        if (moveInput.magnitude > 0.1)
+        {
+            /*animator.SetFloat("MoveX", moveInput.x);
+            animator.SetFloat("MoveY", moveInput.y);*/
+            if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
+            {
+                if (moveInput.x > 0)
+                {
+                    animator.SetFloat("MoveX", 1);
+                }
+                else if (moveInput.y < 0)
+                {
+                    animator.SetFloat("MoveX", -1);
+                }
+
+                animator.SetFloat("MoveY", 0);
+            }
+            else
+            {
+                if (moveInput.y > 0)
+                {
+                    animator.SetFloat("MoveY", 1);
+                }
+                else if (moveInput.y < 0)
+                {
+                    animator.SetFloat("MoveY", -1);
+                }
+
+                animator.SetFloat("MoveX", 0);
+            }
+            UpdateCosmeticDirection(moveInput, isMoving ? 1 : 0);
+        }
+
+        var state = GetState();
+
+        _die = false;
+        _takeHit = false;
+
+        if (state == _currentState) return;
+        animator.CrossFade(state, 0, 0);
+        _currentState = state;
     }
 
     /*Vector3 worldPos;
@@ -124,7 +198,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetFloat("Speed", 1);
         else
             animator.SetFloat("Speed", 0);
-        if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
+        /*if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
         {
             if (moveInput.x > 0)
             {
@@ -149,7 +223,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
             animator.SetFloat("MoveX", 0);
-        }
+        }*/
         UpdateCosmeticDirection(moveInput, moveInput.magnitude);
     }
 
@@ -196,38 +270,19 @@ public class PlayerMovement : MonoBehaviour
 
         // animations
         if (distToMouse > followRange)
+        {
             animator.SetFloat("Speed", 1);
+            isMoving = true;
+        }
         else
+        {
             animator.SetFloat("Speed", 0);
-        if(Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
-        {
-            if(moveInput.x > 0)
-            {
-                animator.SetFloat("MoveX", 1);
-            }
-            else
-            {
-                animator.SetFloat("MoveX", -1);
-            }
-            
-            animator.SetFloat("MoveY", 0);
+            isMoving = false;
         }
-        else
-        {
-            if (moveInput.y > 0)
-            {
-                animator.SetFloat("MoveY", 1);
-            }
-            else
-            {
-                animator.SetFloat("MoveY", -1);
-            }
 
-            animator.SetFloat("MoveX", 0);
-        }
         
-        UpdateCosmeticDirection(moveInput, distToMouse > followRange ? 1 : 0);
     }
+
 
     private void TiltPosition()
     {
@@ -269,6 +324,7 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 animator.SetFloat("MoveX", -1);
+                Debug.Log("Idle left");
             }
 
             animator.SetFloat("MoveY", 0);
@@ -327,6 +383,25 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             cosmeticManager.SetDirection(currentDir, Vector3.zero, 0);
+        }
+    }
+
+    private int GetState()
+    {
+        if (Time.time < _lockedTill) return _currentState;
+
+        // Priorities
+        if (_die) return LockState(Die, 1000f);
+        if (_takeHit) return LockState(TakeHit, _takeHitDuration);
+
+        if (!isMoving) return Idle;
+        else return Walk;
+
+
+        int LockState(int s, float t)
+        {
+            _lockedTill = Time.time + t;
+            return s;
         }
     }
 }
