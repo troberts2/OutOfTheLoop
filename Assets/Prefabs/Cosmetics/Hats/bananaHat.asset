@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b106519fb200fa94a8513fb9d9b3906b, type: 3}
+  m_Name: bananaHat
+  m_EditorClassIdentifier: 
+  hatName: Banana Hat
+  type: 0
+  sprites:
+    up: {fileID: 1180502323, guid: 8fb486e7b9daf8644b3c52747ef2b66e, type: 3}
+    down: {fileID: -1867344668, guid: 8fb486e7b9daf8644b3c52747ef2b66e, type: 3}
+    left: {fileID: -1853045780, guid: 8fb486e7b9daf8644b3c52747ef2b66e, type: 3}
+    right: {fileID: 832265409, guid: 8fb486e7b9daf8644b3c52747ef2b66e, type: 3}
+  animations:
+    controller: {fileID: 0}

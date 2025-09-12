@@ -21,10 +21,26 @@ public class HighScoreData
 }
 
 [System.Serializable]
+public class SavedCosmeticData
+{
+    public Hat savedHat = null;
+    public Shirt savedShirt = null;
+    public Sprite savedTrail = null;
+}
+
+[System.Serializable]
+public class TesterFlag
+{
+    public bool isTester = true;
+}
+
+[System.Serializable]
 public class SaveFile
 {
     public SettingsData settings = new SettingsData();
     public HighScoreData highscoreData = new HighScoreData();
+    public SavedCosmeticData cosmeticData = new SavedCosmeticData();
+    public TesterFlag testerFlag = new TesterFlag();
 }
 
 public enum MovementType

@@ -59,6 +59,22 @@ public class OptionsSettings : MonoBehaviour
 
         movementDropdown.value = (int)save.settings.currentMovementType;
 
+        if (movementDropdown.value == 2)
+        {
+            OpenCalibrateScreen();
+            Screen.orientation = OrientationUtils.GetCurrentOrientation();
+        }
+        else
+        {
+            // Re-enable autorotation
+            Screen.orientation = ScreenOrientation.AutoRotation;
+
+            Screen.autorotateToLandscapeLeft = true;
+            Screen.autorotateToLandscapeRight = true;
+            Screen.autorotateToPortrait = false;
+            Screen.autorotateToPortraitUpsideDown = false;
+        }
+
 #if UNITY_WEBGL
         //set resolution to 1280x720 for webGL window. Player cannot fullscreen or change res
         selectedResolution = 1;
@@ -107,6 +123,17 @@ public class OptionsSettings : MonoBehaviour
         if(movementDropdown.value == 2)
         {
             OpenCalibrateScreen();
+            Screen.orientation = OrientationUtils.GetCurrentOrientation();
+        }
+        else
+        {
+            // Re-enable autorotation
+            Screen.orientation = ScreenOrientation.AutoRotation;
+
+            Screen.autorotateToLandscapeLeft = true;
+            Screen.autorotateToLandscapeRight = true;
+            Screen.autorotateToPortrait = false;
+            Screen.autorotateToPortraitUpsideDown = false;
         }
     }
 

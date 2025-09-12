@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
-using static UnityEditor.Experimental.GraphView.GraphView;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -80,7 +80,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnGameReset()
     {
-        canMove = true;
+        if(SceneManager.GetActiveScene().name != "CosmeticsPicker")
+        {
+            canMove = true;
+        }
+        
         animator.Rebind();
         _lockedTill = Time.time;
         playerJoystick.gameObject.SetActive(true);
@@ -130,8 +134,8 @@ public class PlayerMovement : MonoBehaviour
 
                 animator.SetFloat("MoveX", 0);
             }
-            UpdateCosmeticDirection(moveInput, isMoving ? 1 : 0);
         }
+        UpdateCosmeticDirection(moveInput, isMoving ? 1 : 0);
 
         var state = GetState();
 
@@ -193,38 +197,17 @@ public class PlayerMovement : MonoBehaviour
             rb.MovePosition(rb.position + (Vector2)moveInput * followSpeed * Time.fixedDeltaTime);
         }
 
-        //animations
+        // animations
         if (moveInput.magnitude >= 0.1f)
-            animator.SetFloat("Speed", 1);
-        else
-            animator.SetFloat("Speed", 0);
-        /*if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
         {
-            if (moveInput.x > 0)
-            {
-                animator.SetFloat("MoveX", 1);
-            }
-            else
-            {
-                animator.SetFloat("MoveX", -1);
-            }
-
-            animator.SetFloat("MoveY", 0);
+            animator.SetFloat("Speed", 1);
+            isMoving = true;
         }
         else
         {
-            if (moveInput.y > 0)
-            {
-                animator.SetFloat("MoveY", 1);
-            }
-            else
-            {
-                animator.SetFloat("MoveY", -1);
-            }
-
-            animator.SetFloat("MoveX", 0);
-        }*/
-        UpdateCosmeticDirection(moveInput, moveInput.magnitude);
+            animator.SetFloat("Speed", 0);
+            isMoving = false;
+        }
     }
 
     Vector3 worldPos;
@@ -267,7 +250,6 @@ public class PlayerMovement : MonoBehaviour
             distToMouse = 0;
         }
         
-
         // animations
         if (distToMouse > followRange)
         {
@@ -278,9 +260,7 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetFloat("Speed", 0);
             isMoving = false;
-        }
-
-        
+        }     
     }
 
 
@@ -310,39 +290,17 @@ public class PlayerMovement : MonoBehaviour
         // Move player proportionally to tilt
         rb.MovePosition(rb.position + (Vector2)moveInput * followSpeed * Time.fixedDeltaTime);
 
-        //animations
+        // animations
         if (moveInput.magnitude >= tiltThreshold)
+        {
             animator.SetFloat("Speed", 1);
+            isMoving = true;
+        }
         else
+        {
             animator.SetFloat("Speed", 0);
-        if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
-        {
-            if (moveInput.x > 0)
-            {
-                animator.SetFloat("MoveX", 1);
-            }
-            else
-            {
-                animator.SetFloat("MoveX", -1);
-                Debug.Log("Idle left");
-            }
-
-            animator.SetFloat("MoveY", 0);
+            isMoving = false;
         }
-        else
-        {
-            if (moveInput.y > 0)
-            {
-                animator.SetFloat("MoveY", 1);
-            }
-            else
-            {
-                animator.SetFloat("MoveY", -1);
-            }
-
-            animator.SetFloat("MoveX", 0);
-        }
-        UpdateCosmeticDirection(moveInput, moveInput.magnitude);
     }
 
     private CosmeticManager.Direction currentDir;

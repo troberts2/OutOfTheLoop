@@ -65,6 +65,13 @@ public class MainMenu : MonoBehaviour
         GameManager.Instance.ResetGame();
     }
 
+    public void CosmeticScreen()
+    {
+        EventSystem.current.enabled = false;
+        SceneManager.LoadScene("CosmeticsPicker");
+        GameManager.Instance.ResetGame();
+    }
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         mainMenuCanvas.worldCamera = Camera.main;

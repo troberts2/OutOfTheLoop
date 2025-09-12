@@ -1,6 +1,6 @@
 using System.Collections;
-using UnityEditor.Animations;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CosmeticManager : MonoBehaviour
 {
@@ -19,10 +19,14 @@ public class CosmeticManager : MonoBehaviour
     [SerializeField] private SpriteRenderer costumeRenderer;
     [SerializeField] private Animator costumeAnimator;
 
+    [Header("Trail")]
+    [SerializeField] private ParticleSystem trailPS;
+
     [Header("Current Cosmetics")]
-    [SerializeField] private Hat currentHat;
-    [SerializeField] private Shirt currentShirt;
-    [SerializeField] private Costume currentCostume;
+    public Hat currentHat;
+    public Shirt currentShirt;
+    public Costume currentCostume;
+    public Sprite currentTrail;
 
     public enum Direction { Up, Down, Left, Right }
     private Direction currentDirection = Direction.Down;
@@ -33,11 +37,13 @@ public class CosmeticManager : MonoBehaviour
     private void OnEnable()
     {
         PlayerCollision.OnPlayerHurt += OnPlayerHurt;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         PlayerCollision.OnPlayerHurt -= OnPlayerHurt;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void Start()
@@ -48,6 +54,13 @@ public class CosmeticManager : MonoBehaviour
     private void OnPlayerHurt()
     {
         StartCoroutine(IFrames());
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        currentHat = GameManager.Instance.currentHat;
+        currentShirt = GameManager.Instance.currentShirt;
+        currentTrail = GameManager.Instance.currentTrail;
     }
 
     public void SetHat(Hat newHat)
@@ -112,6 +125,30 @@ public class CosmeticManager : MonoBehaviour
             CheckWhatWeightToEnable(currentShirt);
             shirtRenderer.sprite = null;
         }
+
+        if(currentTrail !=null)
+        {
+            ApplyTrail();
+        }
+        else
+        {
+            trailPS.Stop();
+            trailPS.textureSheetAnimation.SetSprite(0, null);
+        }
+    }
+
+    private void ApplyTrail()
+    {
+        trailPS.textureSheetAnimation.SetSprite(0, currentTrail);
+        if (playerSpeed > 0)
+        {
+            if (!trailPS.isPlaying) trailPS.Play();
+            SetTrailRotation();
+        }
+        else
+        {
+            trailPS.Stop();
+        }
     }
 
     private void ApplyCosmetic(SpriteRenderer sr, Animator anim, CosmeticType type,
@@ -146,11 +183,6 @@ public class CosmeticManager : MonoBehaviour
             Direction.Right => ds.right,
             _ => ds.down
         };
-    }
-
-    private AnimatorController GetAnimator(DirectionalAnimations da, Direction dir)
-    {
-        return da.controller;
     }
 
     private IEnumerator IFrames()
@@ -234,6 +266,22 @@ public class CosmeticManager : MonoBehaviour
         else
         {
             Debug.LogWarning($"Layer '{layerName}' not found on {playerAnimator.gameObject.name}");
+        }
+    }
+
+    private void SetTrailRotation()
+    {
+        if (currentMoveInput.sqrMagnitude > 0.01f)
+        {
+            // Get direction *away* from movement
+            Vector2 awayDir = -currentMoveInput.normalized;
+
+            // Calculate angle in degrees
+            float angle = Mathf.Atan2(awayDir.y, awayDir.x) * Mathf.Rad2Deg;
+
+            // Smooth rotate toward that angle
+            Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
+            trailPS.transform.rotation = targetRotation;
         }
     }
 }

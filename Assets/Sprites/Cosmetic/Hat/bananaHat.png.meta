@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bd943f3b96bab514facdc178fe69f929
+guid: 8fb486e7b9daf8644b3c52747ef2b66e
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -123,106 +123,85 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: topHat_0
+      name: bananaHat_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 3
-        width: 10
-        height: 16
+        x: 5
+        y: 10
+        width: 6
+        height: 10
       alignment: 9
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0.5, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 44aa7e80223249841a06ac1b68d19617
-      internalID: 781257205
+      spriteID: 3d8396df2a1fff643bd9a135edf40947
+      internalID: -1867344668
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: topHat_1
+      name: bananaHat_1
       rect:
         serializedVersion: 2
         x: 18
-        y: 3
-        width: 10
-        height: 16
+        y: 10
+        width: 9
+        height: 10
       alignment: 9
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0.44444445, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ea2d10f2e363d0344bb4172586538a45
-      internalID: -2141174236
+      spriteID: e99eff45b2af051478b41ace732893f5
+      internalID: 832265409
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: topHat_2
+      name: bananaHat_2
       rect:
         serializedVersion: 2
-        x: 34
-        y: 3
-        width: 10
-        height: 16
+        x: 35
+        y: 10
+        width: 9
+        height: 10
       alignment: 9
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0.5555556, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6d055d6e82e907d41931b0d869299b17
-      internalID: 1746823477
+      spriteID: 25a2a57e432e5404db59f4243981773f
+      internalID: -1853045780
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: topHat_3
+      name: bananaHat_3
       rect:
         serializedVersion: 2
-        x: 51
-        y: 3
-        width: 10
-        height: 17
+        x: 53
+        y: 10
+        width: 6
+        height: 10
       alignment: 9
-      pivot: {x: 0.5, y: 0.47058824}
+      pivot: {x: 0.5, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5fb4446434cf02f4c9c96442ae1d47cf
-      internalID: 1653084020
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: topHat_4
-      rect:
-        serializedVersion: 2
-        x: 68
-        y: 11
-        width: 10
-        height: 8
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7dd887826c11fce47bc1e66263d092dc
-      internalID: 346990032
+      spriteID: 5cfc3e2be8f01434d97f4dab57ccf1cb
+      internalID: 1180502323
       vertices: []
       indices: 
       edges: []
@@ -238,11 +217,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      topHat_0: 781257205
-      topHat_1: -2141174236
-      topHat_2: 1746823477
-      topHat_3: 1653084020
-      topHat_4: 346990032
+      bananaHat_0: -1867344668
+      bananaHat_1: 832265409
+      bananaHat_2: -1853045780
+      bananaHat_3: 1180502323
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

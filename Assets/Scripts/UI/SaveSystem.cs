@@ -74,6 +74,20 @@ public class SaveSystem : MonoBehaviour
         Debug.Log("saved to " + fullPath);
     }
 
+    public void SaveCosmetics(Hat hat, Shirt shirt, Sprite trail)
+    {
+        SaveFile save = LoadGame();
+
+        save.cosmeticData.savedHat = hat;
+        save.cosmeticData.savedShirt = shirt;
+        save.cosmeticData.savedTrail = trail;
+
+        //actually write and save in json
+        string json = JsonUtility.ToJson(save, true); // 'true' for pretty print (optional)
+        File.WriteAllText(fullPath, json);
+        Debug.Log("saved to " + fullPath);
+    }
+
     public SaveFile LoadGame()
     {
         if (File.Exists(fullPath))

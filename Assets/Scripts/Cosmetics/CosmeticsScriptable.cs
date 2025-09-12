@@ -1,4 +1,4 @@
-using UnityEditor.Animations;
+
 using UnityEngine;
 
 [System.Serializable]
@@ -13,7 +13,6 @@ public class DirectionalSprites
 [System.Serializable]
 public class DirectionalAnimations
 {
-    public AnimatorController controller;
 }
 
 public enum CosmeticType

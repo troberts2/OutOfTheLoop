@@ -228,6 +228,10 @@ public class BasicEnemyCircle : MonoBehaviour
     /// </summary>
     private void OnGameReset()
     {
+        CancelInvoke(nameof(ActivateColliderAndDie));
+        CancelInvoke(nameof(TurnRed));
+        CancelInvoke(nameof(OnGameReset));
+
         indicatorCircle.DOKill();
         indicatorCircle.localScale = Vector2.zero;
 

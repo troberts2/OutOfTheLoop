@@ -19,6 +19,10 @@ public class GameManager : MonoBehaviour
 
     public Vector3 calibrationOffset;
 
+    public Hat currentHat;
+    public Shirt currentShirt;
+    public Sprite currentTrail;
+
     private void Awake()
     {
         if(Instance == null)
@@ -32,8 +36,6 @@ public class GameManager : MonoBehaviour
         }
 
         originalScale = scoreText.transform.localScale;
-        // Prevents the device from sleeping
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     private void OnEnable()
@@ -60,6 +62,12 @@ public class GameManager : MonoBehaviour
     {
         SaveFile save = SaveSystem.Instance.LoadGame();
         movementType = save.settings.currentMovementType;
+        currentHat = save.cosmeticData.savedHat;
+        currentShirt = save.cosmeticData.savedShirt;
+        currentTrail = save.cosmeticData.savedTrail;
+
+        // Prevents the device from sleeping
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     private void OnPlayerDeath()
