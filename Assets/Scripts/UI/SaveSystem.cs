@@ -88,6 +88,18 @@ public class SaveSystem : MonoBehaviour
         Debug.Log("saved to " + fullPath);
     }
 
+    public void SaveLocalUnlocks(Dictionary<string, bool> unlockedProducts)
+    {
+        SaveFile save = LoadGame();
+
+        save.localUnlocks.savedUnlockedProducts = unlockedProducts;
+
+        //actually write and save in json
+        string json = JsonUtility.ToJson(save, true); // 'true' for pretty print (optional)
+        File.WriteAllText(fullPath, json);
+        Debug.Log("saved to " + fullPath);
+    }
+
     public SaveFile LoadGame()
     {
         if (File.Exists(fullPath))

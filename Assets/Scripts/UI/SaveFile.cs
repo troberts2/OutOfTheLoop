@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,7 +32,16 @@ public class SavedCosmeticData
 [System.Serializable]
 public class TesterFlag
 {
+    //changed for non test versions of game
     public bool isTester = true;
+}
+
+[System.Serializable]
+public class LocalUnlocks
+{
+    // Keeps runtime unlocked state in memory; mirror it to your JSON save system.
+    // Key = productId, Value = unlocked (true/false)
+    public Dictionary<string, bool> savedUnlockedProducts = new Dictionary<string, bool>(StringComparer.Ordinal);
 }
 
 [System.Serializable]
@@ -41,6 +51,7 @@ public class SaveFile
     public HighScoreData highscoreData = new HighScoreData();
     public SavedCosmeticData cosmeticData = new SavedCosmeticData();
     public TesterFlag testerFlag = new TesterFlag();
+    public LocalUnlocks localUnlocks = new LocalUnlocks();
 }
 
 public enum MovementType
