@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -33,7 +34,7 @@ public class SavedCosmeticData
 public class TesterFlag
 {
     //changed for non test versions of game
-    public bool isTester = true;
+    public bool isTester = false;
 }
 
 [System.Serializable]
@@ -41,7 +42,7 @@ public class LocalUnlocks
 {
     // Keeps runtime unlocked state in memory; mirror it to your JSON save system.
     // Key = productId, Value = unlocked (true/false)
-    public Dictionary<string, bool> savedUnlockedProducts = new Dictionary<string, bool>(StringComparer.Ordinal);
+    public SerializableDictionary savedUnlockedProducts = new();
 }
 
 [System.Serializable]
@@ -59,4 +60,25 @@ public enum MovementType
     FingerFollow,
     JoyStick,
     Tilt
+}
+
+[System.Serializable]
+public class SerializableDictionary
+{
+    public List<string> keys = new();
+    public List<bool> values = new();
+
+    public Dictionary<string, bool> ToDictionary()
+    {
+        var dict = new Dictionary<string, bool>();
+        for (int i = 0; i < keys.Count; i++)
+            dict[keys[i]] = values[i];
+        return dict;
+    }
+
+    public void FromDictionary(Dictionary<string, bool> dict)
+    {
+        keys = dict.Keys.ToList();
+        values = dict.Values.ToList();
+    }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Purchasing;
@@ -32,6 +33,8 @@ namespace Samples.Purchasing.IAP5.Minimal
             "com.trobertsDev.OutOfTheLoop.6" // trail (banana)
         };
 
+        [SerializeField] private Button yesButton; // to buy cosmetics
+
         [SerializeField] private Sprite[] productImages;
         [SerializeField] private GameObject[] lockPanels;
 
@@ -43,17 +46,16 @@ namespace Samples.Purchasing.IAP5.Minimal
 
         [SerializeField] private GameObject buyPanel;
         [SerializeField] private Image productImage;
+        [SerializeField] private GameObject noAdsButton; // to be disabled afer no ads is bought
+        [SerializeField] private CodelessIAPButton iapButton; // to change when a product is selected
         private Sprite currentSelectedSprite;
         private string currentSelectedProductId;
 
         #region Unity lifecycle
-        protected void Awake()
+        protected void Start()
         {
             // First, load any locally saved purchases (so UI/logic is responsive before store connect).
             LoadLocalPurchases();
-
-            // Initialize unlocking of any known local purchases in-memory (UI might rely on this).
-            ApplyLocalUnlocks();
 
             // Start IAP initialization/connect to Play.
             InitializeIAP();
@@ -66,10 +68,9 @@ namespace Samples.Purchasing.IAP5.Minimal
             Debug.Log("IAP: Initializing...");
 
             m_StoreController = UnityIAPServices.StoreController();
+            m_StoreController.OnPurchasesFetched += PurchasesFetchedSuccess;
+            m_StoreController.OnPurchasesFetchFailed += PurchasesFetchedFailed;
 
-            // Wire events from the sample controller
-            m_StoreController.OnPurchasePending += OnPurchasePending;
-            m_StoreController.OnPurchaseConfirmed += OnPurchaseConfirmed;
 
             try
             {
@@ -89,13 +90,21 @@ namespace Samples.Purchasing.IAP5.Minimal
 
             m_StoreController.FetchProducts(productsToFetch);
 
-            // After fetching, attempt to unlock any owned (non-consumable) products by checking receipts.
-            // Note: FetchProducts is usually asynchronous — depending on the StoreController impl you might
-            // want to wait for a callback; here we give a small delay path-free approach by calling UnlockOwnedProducts()
-            // The StoreController's GetProducts() should return up-to-date products after FetchProducts completes.
-            // If your StoreController provides a callback for "fetch complete", consider calling UnlockOwnedProducts there.
+            m_StoreController.FetchPurchases();
+
             await System.Threading.Tasks.Task.Delay(500); // small wait to allow product list populate in many environments
-            UnlockOwnedProducts();
+            
+        }
+
+        private void PurchasesFetchedSuccess(Orders orders)
+        {
+            var purchases = m_StoreController.GetPurchases();
+            UnlockOwnedProducts(purchases);
+        }
+
+        private void PurchasesFetchedFailed(PurchasesFetchFailureDescription description)
+        {
+            Debug.Log(description.Message);
         }
         #endregion
 
@@ -111,18 +120,34 @@ namespace Samples.Purchasing.IAP5.Minimal
             if(currentSelectedProductId == nonConsumableProductIds[1]) //top hat
             {
                 currentSelectedSprite = productImages[0];
+                iapButton.productId = "3";
+                iapButton.onOrderConfirmed.RemoveAllListeners();
+                iapButton.onOrderConfirmed.AddListener(GetTopHat);
+                iapButton.button = yesButton; // top hat
             }
             else if (currentSelectedProductId == nonConsumableProductIds[2]) //banana hat
             {
                 currentSelectedSprite = productImages[1];
+                iapButton.productId = "4";
+                iapButton.onOrderConfirmed.RemoveAllListeners();
+                iapButton.onOrderConfirmed.AddListener(GetBananaHat);
+                iapButton.button = yesButton; // banana hat
             }
             else if (currentSelectedProductId == nonConsumableProductIds[3]) //fancy suit
             {
                 currentSelectedSprite = productImages[2];
+                iapButton.productId = "5";
+                iapButton.onOrderConfirmed.RemoveAllListeners();
+                iapButton.onOrderConfirmed.AddListener(GetSuitCostume);
+                iapButton.button = yesButton; // suit
             }
             else if (currentSelectedProductId == nonConsumableProductIds[4]) //trail
             {
                 currentSelectedSprite = productImages[3];
+                iapButton.productId = "5";
+                iapButton.onOrderConfirmed.RemoveAllListeners();
+                iapButton.onOrderConfirmed.AddListener(GetBananaTrail);
+                iapButton.button = yesButton; // banana trail
             }
 
             productImage.sprite = currentSelectedSprite;
@@ -134,106 +159,8 @@ namespace Samples.Purchasing.IAP5.Minimal
             currentSelectedProductId = null;
             currentSelectedSprite = null;
 
+            if(SceneManager.GetActiveScene().name != "CosmeticsPicker") { return; }
             productImage.sprite = null;
-        }
-
-        /// <summary>
-        /// UI button can call this and pass the productId string as parameter.
-        /// Example: Button -> OnClick() -> PaywallManager.BuyProductById -> "com.yourcompany.yourgame.no_ads"
-        /// </summary>
-        public void BuyProductById()
-        {
-            if (string.IsNullOrEmpty(currentSelectedProductId))
-            {
-                Debug.Log("BuyProductById: productId is null/empty.");
-                return;
-            }
-
-            // Ensure it's one of our non-consumables (optional guard)
-            if (!nonConsumableProductIds.Contains(currentSelectedProductId))
-            {
-                Debug.Log($"BuyProductById: {currentSelectedProductId} is not in nonConsumableProductIds list.");
-                // still allow purchase if you want; returning here enforces only allowed list
-                // return;
-            }
-
-            InitiatePurchase(currentSelectedProductId);
-        }
-
-        // Triggers the underlying store controller purchase
-        void InitiatePurchase(string productId)
-        {
-            var product = m_StoreController?.GetProducts().FirstOrDefault(p => p.definition.id == productId);
-
-            if (product != null)
-            {
-                Debug.Log($"Initiating purchase for {productId}");
-                m_StoreController?.PurchaseProduct(product);
-            }
-            else
-            {
-                Debug.Log($"The product service has no product with the ID {productId} (not fetched or wrong id).");
-            }
-
-            CloseBuyPanel();
-        }
-
-        // Expose restore to UI
-        public void RestorePurchases()
-        {
-            Debug.Log("RestorePurchases called.");
-            m_StoreController.RestoreTransactions(OnTransactionsRestored);
-        }
-
-        void OnTransactionsRestored(bool success, string error)
-        {
-            Debug.Log("Transactions restored: " + success + (string.IsNullOrEmpty(error) ? "" : $", error: {error}"));
-            if (success)
-            {
-                // After restore, ensure store-owned products are unlocked
-                UnlockOwnedProducts();
-            }
-        }
-        #endregion
-
-        #region Purchase event handlers (from sample)
-        void OnPurchasePending(PendingOrder order)
-        {
-            // If you want to validate pending orders before confirming, do it here.
-            // For non-consumables you may want to confirm after entitlement is granted.
-            Debug.Log($"OnPurchasePending: {order.CartOrdered.Items().First().Product.definition.id}");
-            // For this sample we confirm immediately and then grant entitlement in OnPurchaseConfirmed
-            m_StoreController.ConfirmPurchase(order);
-        }
-
-        void OnPurchaseConfirmed(Order order)
-        {
-            // This is called when store confirms purchase (or fails)
-            switch (order)
-            {
-                case FailedOrder failedOrder:
-                    {
-                        var pid = failedOrder.CartOrdered.Items().First().Product.definition.id;
-                        Debug.Log($"Purchase confirmation failed: {pid}, {failedOrder.FailureReason}, {failedOrder.Details}");
-                        break;
-                    }
-                case ConfirmedOrder confirmed:
-                    {
-                        var pid = confirmed.CartOrdered.Items().First().Product.definition.id;
-                        Debug.Log($"Purchase completed: {pid}");
-
-                        // Grant the entitlement (unlock the item) and save locally
-                        GrantEntitlement(pid);
-
-                        break;
-                    }
-                default:
-                    {
-                        // Other order types (if any)
-                        Debug.Log("OnPurchaseConfirmed: Unknown order type.");
-                        break;
-                    }
-            }
         }
         #endregion
 
@@ -253,31 +180,79 @@ namespace Samples.Purchasing.IAP5.Minimal
             // Set in-memory unlocked flag
             unlockedProducts[productId] = true;
 
-            ApplyUnlockToGame(productId);
-
             // Persist to local JSON save system:
             // Implement SavePurchaseLocally to actually write your save data (e.g., call your JSON save manager)
-            SavePurchaseLocally(productId);
-
-            // Optional: send purchase token/receipt to your backend for server-side validation and granting
-            // e.g., StartCoroutine(SendReceiptToServer(...));
+            SavePurchaseLocally();
         }
 
-        // Apply the unlocked state to your game (UI, local runtime data)
-        void ApplyUnlockToGame(string productId)
+        public void GetAdFree(ConfirmedOrder order)
         {
-            if (SceneManager.GetActiveScene().name == "CosmeticsPicker") return;
-            // TODO ACTUALLY do logic for these
-            Debug.Log($"Applying unlock for product: {productId}");
-            if (productId == "com.trobertsDev.OutOfTheLoop.1") ;//disable ads
-            else if (productId == "com.trobertsDev.OutOfTheLoop.3") //hat (top hat)
+            //unlock in memory
+            GrantEntitlement(currentSelectedProductId);
+
+            //actually disable ads
+            AdManager.Instance.DisableAds();
+
+            //close buy panel
+            CloseBuyPanel();
+
+            //Disable ad free button
+            if(SceneManager.GetActiveScene().name == "MainMenu")
+            {
+                noAdsButton.SetActive(false);
+            }
+        }
+
+        public void GetTopHat(ConfirmedOrder order)
+        {
+            GrantEntitlement(currentSelectedProductId);
+
+            if(SceneManager.GetActiveScene().name == "CosmeticsPicker")
+            {
                 lockPanels[0].SetActive(false);
-            else if (productId == "com.trobertsDev.OutOfTheLoop.4") //hat (banana)
+            }
+
+            //close buy panel
+            CloseBuyPanel();
+        }
+
+        public void GetBananaHat(ConfirmedOrder order)
+        {
+            GrantEntitlement(currentSelectedProductId);
+
+            if (SceneManager.GetActiveScene().name == "CosmeticsPicker")
+            {
                 lockPanels[1].SetActive(false);
-            else if (productId == "com.trobertsDev.OutOfTheLoop.5") //costume (suit)
+            }
+
+            //close buy panel
+            CloseBuyPanel();
+        }
+
+        public void GetSuitCostume(ConfirmedOrder order)
+        {
+            GrantEntitlement(currentSelectedProductId);
+
+            if (SceneManager.GetActiveScene().name == "CosmeticsPicker")
+            {
                 lockPanels[2].SetActive(false);
-            else if (productId == "com.trobertsDev.OutOfTheLoop.6") //trail (banana)
+            }
+
+            //close buy panel
+            CloseBuyPanel();
+        }
+
+        public void GetBananaTrail(ConfirmedOrder order)
+        {
+            GrantEntitlement(currentSelectedProductId);
+
+            if (SceneManager.GetActiveScene().name == "CosmeticsPicker")
+            {
                 lockPanels[3].SetActive(false);
+            }
+
+            //close buy panel
+            CloseBuyPanel();
         }
 
         #endregion
@@ -287,7 +262,7 @@ namespace Samples.Purchasing.IAP5.Minimal
         /// Iterates fetched products and unlocks any non-consumables that have a receipt.
         /// This is the reliable method to reconcile purchases made previously on other devices.
         /// </summary>
-        void UnlockOwnedProducts()
+        void UnlockOwnedProducts(ReadOnlyObservableCollection<Order> purchases)
         {
             if (m_StoreController == null)
             {
@@ -295,54 +270,17 @@ namespace Samples.Purchasing.IAP5.Minimal
                 return;
             }
 
-            var products = m_StoreController.GetProducts();
-            if (products == null)
+            Debug.Log("unlocked products from store");
+            foreach (Order order in purchases)
             {
-                Debug.Log("UnlockOwnedProducts: no products returned by controller.");
-                return;
+                string orderProductID = order.CartOrdered.Items()[0].Product.definition.id;
+                unlockedProducts[orderProductID] = true;
+                Debug.Log("Unlocked Product from receipt: " + orderProductID);
             }
 
-            foreach (var p in products)
-            {
-                try
-                {
-                    // Only care about non-consumables in this manager
-                    if (p.definition.type != ProductType.NonConsumable)
-                        continue;
+            SavePurchaseLocally();
 
-                    // If product has a receipt, Play reports it as owned — unlock it.
-                    // Note: .hasReceipt is true when store records an ownership that can be restored.
-                    bool owned = false;
-                    // safe access: some product implementations expose .hasReceipt (UnityEngine.Purchasing.Product)
-                    var unityProduct = p as UnityEngine.Purchasing.Product;
-                    if (unityProduct != null)
-                    {
-                        owned = !string.IsNullOrEmpty(unityProduct.receipt);
-                    }
-                    else
-                    {
-                        // Fallback: some store SDK wrappers provide a 'hasReceipt' or 'receipt' property on the product
-                        // If not available, you may need to use your StoreController's purchase/restore API directly.
-                        // For now, we try to inspect .hasReceipt via reflection as a last resort:
-                        var hasReceiptProp = p.GetType().GetProperty("hasReceipt");
-                        if (hasReceiptProp != null)
-                        {
-                            var val = hasReceiptProp.GetValue(p);
-                            if (val is bool b) owned = b;
-                        }
-                    }
-
-                    if (owned)
-                    {
-                        Debug.Log($"UnlockOwnedProducts: owned -> {p.definition.id}");
-                        GrantEntitlement(p.definition.id);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log($"UnlockOwnedProducts: exception for product {p.definition.id}: {ex.Message}");
-                }
-            }
+            ApplyLocalUnlocks();
         }
         #endregion
 
@@ -355,9 +293,9 @@ namespace Samples.Purchasing.IAP5.Minimal
         /// Persist that the productId is owned in your JSON save file.
         /// Called from GrantEntitlement after unlocking.
         /// </summary>
-        void SavePurchaseLocally(string productId)
+        void SavePurchaseLocally()
         {
-            Debug.Log($"[SavePurchaseLocally] {productId}");
+            Debug.Log($"[SavePurchaseLocally] {currentSelectedProductId}");
 
             SaveSystem.Instance.SaveLocalUnlocks(unlockedProducts);
         }
@@ -370,15 +308,9 @@ namespace Samples.Purchasing.IAP5.Minimal
         {
             Debug.Log("[LoadLocalPurchases] Loading local purchases (if any).");
 
-            SaveFile save = SaveSystem.Instance.LoadGame();
-            unlockedProducts = save.localUnlocks.savedUnlockedProducts;
+            unlockedProducts = SaveSystem.Instance.LoadUnlocks();
 
-            // For demonstration, if nothing saved we ensure dictionary contains our product ids set to false.
-            foreach (var id in nonConsumableProductIds)
-            {
-                if (!unlockedProducts.ContainsKey(id))
-                    unlockedProducts[id] = false;
-            }
+            ApplyLocalUnlocks();
         }
 
         /// <summary>
@@ -387,15 +319,51 @@ namespace Samples.Purchasing.IAP5.Minimal
         /// </summary>
         void ApplyLocalUnlocks()
         {
+            bool isTester = SaveSystem.Instance.LoadGame().testerFlag.isTester;
             foreach (var kv in unlockedProducts)
             {
-                if (kv.Value)
+
+                if (kv.Value || isTester)
                 {
                     ApplyUnlockToGame(kv.Key);
                 }
             }
         }
         // -------------------------------------------------------
+
+        private void ApplyUnlockToGame(string productID)
+        {
+            //apply ad free always if user has
+            if (productID == nonConsumableProductIds[0])
+            {// ad free
+                GetAdFree(null);
+            }
+
+            if(SceneManager.GetActiveScene().name != "CosmeticsPicker")
+            {
+                return;
+            }
+
+            if (productID == nonConsumableProductIds[1])
+            {// top hat
+                GetTopHat(null);
+            }
+
+            if (productID == nonConsumableProductIds[2])
+            {// banana hat
+                GetBananaHat(null);
+            }
+
+            if (productID == nonConsumableProductIds[3])
+            {// Suit
+                GetSuitCostume(null);
+            }
+
+            if (productID == nonConsumableProductIds[4])
+            {// banana trail
+                GetBananaTrail(null);
+            }
+        }
         #endregion
     }
 }

@@ -44,12 +44,15 @@ public class CosmeticPicker : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode load)
+    private void Start()
     {
         SelectSavedHat();
         SelectSavedShirt();
         SelectSavedTrail();
+    }
 
+    private void OnSceneLoaded(Scene scene, LoadSceneMode load)
+    {
         // Step 1: Get the UI element's screen position
         Vector3 screenPos = RectTransformUtility.WorldToScreenPoint(null, uiElement.position);
 

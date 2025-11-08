@@ -13,7 +13,7 @@ public class AdManager : MonoBehaviour
     public LevelPlayInterstitialAd interstitialAd;
     public LevelPlayRewardedAd rewardedVideoAd;
 
-    public bool isAdsEnabled = false;
+    public bool isAdsEnabled = true;
     public bool hasWatchedAdThisRun = false;
 
     public static event Action OnPlayerContinueReward;
@@ -46,6 +46,11 @@ public class AdManager : MonoBehaviour
 
         bannerAd?.DestroyAd();
         interstitialAd?.DestroyAd();
+    }
+
+    public void DisableAds()
+    {
+        isAdsEnabled = false;
     }
 
     private void Start()
@@ -122,6 +127,8 @@ public class AdManager : MonoBehaviour
 
     public void ShowInterstitial()
     {
+        if (!isAdsEnabled) return; //skip ads for paid users
+
         interstitialAd?.ShowAd();
     }
 
