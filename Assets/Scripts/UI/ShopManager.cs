@@ -83,6 +83,14 @@ namespace Samples.Purchasing.IAP5.Minimal
                 // still attempt to fetch products — controller might be partially usable depending on implementation
             }
 
+            RestorePurchases();
+
+            await System.Threading.Tasks.Task.Delay(500); // small wait to allow product list populate in many environments
+            
+        }
+
+        public void RestorePurchases()
+        {
             // Build the ProductDefinition list limited to your non-consumables
             var productsToFetch = nonConsumableProductIds
                 .Select(id => new ProductDefinition(id, ProductType.NonConsumable))
@@ -91,9 +99,6 @@ namespace Samples.Purchasing.IAP5.Minimal
             m_StoreController.FetchProducts(productsToFetch);
 
             m_StoreController.FetchPurchases();
-
-            await System.Threading.Tasks.Task.Delay(500); // small wait to allow product list populate in many environments
-            
         }
 
         private void PurchasesFetchedSuccess(Orders orders)

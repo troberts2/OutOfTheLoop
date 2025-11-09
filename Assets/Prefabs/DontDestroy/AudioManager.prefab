@@ -49,9 +49,13 @@ MonoBehaviour:
   poolSize: 30
   musicSource: {fileID: 682382004629160473}
   musicClips:
+  - {fileID: 8300000, guid: 5676029fcb2697242abaf4b462c79db6, type: 3}
+  - {fileID: 8300000, guid: 240baa936acf3174c8b4f1d5c3e4775c, type: 3}
   - {fileID: 8300000, guid: 20bb693045c308943b8d4a0ed9cea2db, type: 3}
   - {fileID: 8300000, guid: 1b85bab3eee1cd44da9ac8782801fe7d, type: 3}
   - {fileID: 8300000, guid: 741e0e56b48ac1f49ad68d3c85702205, type: 3}
+  - {fileID: 8300000, guid: 40a0f975b2db0ad4ebb73ed8e25ecf47, type: 3}
+  - {fileID: 8300000, guid: 39f8ddd2fe899094f89c6d295b232961, type: 3}
 --- !u!1 &7261941583796141514
 GameObject:
   m_ObjectHideFlags: 0

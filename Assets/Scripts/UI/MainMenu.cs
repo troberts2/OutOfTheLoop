@@ -9,6 +9,7 @@ public class MainMenu : MonoBehaviour
     private const string onPlayClickedSceneName = "GameScene";
 
     [SerializeField] private Canvas mainMenuCanvas;
+    [SerializeField] private GameObject clearSaveDataPanel;
 
     private void OnEnable()
     {
@@ -70,6 +71,22 @@ public class MainMenu : MonoBehaviour
         EventSystem.current.enabled = false;
         SceneManager.LoadScene("CosmeticsPicker");
         GameManager.Instance.ResetGame();
+    }
+
+    public void StartClearAllData()
+    {
+        clearSaveDataPanel.SetActive(true);
+    }
+
+    public void StopClearAllData()
+    {
+        clearSaveDataPanel?.SetActive(false);
+    }
+
+    public void ClearAllData()
+    {
+        SaveSystem.Instance.ClearAllSaveData();
+        clearSaveDataPanel?.SetActive(false);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

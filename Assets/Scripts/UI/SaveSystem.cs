@@ -119,4 +119,14 @@ public class SaveSystem : MonoBehaviour
 
         return new SaveFile(); // default data
     }
+
+    public void ClearAllSaveData()
+    {
+        SaveFile save = new SaveFile();
+
+        //actually write and save in json
+        string json = JsonUtility.ToJson(save, true); // 'true' for pretty print (optional)
+        File.WriteAllText(fullPath, json);
+        Debug.Log("saved to " + fullPath);
+    }
 }
