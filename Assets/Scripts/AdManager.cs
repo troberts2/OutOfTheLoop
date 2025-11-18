@@ -55,7 +55,7 @@ public class AdManager : MonoBehaviour
 
     private void Start()
     {
-        //LevelPlay.ValidateIntegration();
+        LevelPlay.ValidateIntegration();
         // Optional: enable verbose logging
         LevelPlay.SetAdaptersDebug(true);
         //LevelPlay.SetMetaData("is_test_suite", "enable");
@@ -64,7 +64,7 @@ public class AdManager : MonoBehaviour
         LevelPlay.SetMetaData("is_child_directed", "true");
         LevelPlay.SetMetaData("Google_Family_Self_Certified_SDKS", "true");
 
-        /*LevelPlay.Init(AdConfig.AppKey);*/
+        LevelPlay.Init(AdConfig.AppKey);
     }
 
     private void OnGameReset()
@@ -162,7 +162,7 @@ public class AdManager : MonoBehaviour
         LevelPlay.OnImpressionDataReady += ImpressionDataReadyEvent;
 
         // Create Rewarded Video object
-        //rewardedVideoAd = new LevelPlayRewardedAd(AdConfig.RewardedVideoAdUnitId);
+        rewardedVideoAd = new LevelPlayRewardedAd(AdConfig.RewardedVideoAdUnitId);
 
         // Register to Rewarded Video events
         rewardedVideoAd.OnAdLoaded += RewardedVideoOnLoadedEvent;
@@ -175,7 +175,7 @@ public class AdManager : MonoBehaviour
         rewardedVideoAd.OnAdInfoChanged += RewardedVideoOnAdInfoChangedEvent;
 
         // Create Banner object
-        //bannerAd = new LevelPlayBannerAd(AdConfig.BannerAdUnitId);
+        bannerAd = new LevelPlayBannerAd(AdConfig.BannerAdUnitId);
 
         // Register to Banner events
         bannerAd.OnAdLoaded += BannerOnAdLoadedEvent;
@@ -188,7 +188,7 @@ public class AdManager : MonoBehaviour
         bannerAd.OnAdExpanded += BannerOnAdExpandedEvent;
 
         // Create Interstitial object
-        //interstitialAd = new LevelPlayInterstitialAd(AdConfig.InterstitalAdUnitId);
+        interstitialAd = new LevelPlayInterstitialAd(AdConfig.InterstitalAdUnitId);
 
         // Register to Interstitial events
         interstitialAd.OnAdLoaded += InterstitialOnAdLoadedEvent;
