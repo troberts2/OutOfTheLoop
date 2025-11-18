@@ -149,10 +149,34 @@ namespace Samples.Purchasing.IAP5.Minimal
             else if (currentSelectedProductId == nonConsumableProductIds[4]) //trail
             {
                 currentSelectedSprite = productImages[3];
-                iapButton.productId = "5";
+                iapButton.productId = "6";
                 iapButton.onOrderConfirmed.RemoveAllListeners();
                 iapButton.onOrderConfirmed.AddListener(GetBananaTrail);
                 iapButton.button = yesButton; // banana trail
+            }
+            else if (currentSelectedProductId == nonConsumableProductIds[5]) //orange hat
+            {
+                currentSelectedSprite = productImages[4];
+                iapButton.productId = "7";
+                iapButton.onOrderConfirmed.RemoveAllListeners();
+                iapButton.onOrderConfirmed.AddListener(GetOrangeHat);
+                iapButton.button = yesButton; // orange hat
+            }
+            else if (currentSelectedProductId == nonConsumableProductIds[6]) //construction hat
+            {
+                currentSelectedSprite = productImages[5];
+                iapButton.productId = "8";
+                iapButton.onOrderConfirmed.RemoveAllListeners();
+                iapButton.onOrderConfirmed.AddListener(GetConstructionHat);
+                iapButton.button = yesButton; // construction hat
+            }
+            else if (currentSelectedProductId == nonConsumableProductIds[7]) //sombrero hat
+            {
+                currentSelectedSprite = productImages[6];
+                iapButton.productId = "9";
+                iapButton.onOrderConfirmed.RemoveAllListeners();
+                iapButton.onOrderConfirmed.AddListener(GetSombreroHat);
+                iapButton.button = yesButton; // sombrero hat
             }
 
             productImage.sprite = currentSelectedSprite;
@@ -260,6 +284,45 @@ namespace Samples.Purchasing.IAP5.Minimal
             CloseBuyPanel();
         }
 
+        public void GetOrangeHat(ConfirmedOrder order)
+        {
+            GrantEntitlement(currentSelectedProductId);
+
+            if (SceneManager.GetActiveScene().name == "CosmeticsPicker")
+            {
+                lockPanels[4].SetActive(false);
+            }
+
+            //close buy panel
+            CloseBuyPanel();
+        }
+
+        public void GetConstructionHat(ConfirmedOrder order)
+        {
+            GrantEntitlement(currentSelectedProductId);
+
+            if (SceneManager.GetActiveScene().name == "CosmeticsPicker")
+            {
+                lockPanels[5].SetActive(false);
+            }
+
+            //close buy panel
+            CloseBuyPanel();
+        }
+
+        public void GetSombreroHat(ConfirmedOrder order)
+        {
+            GrantEntitlement(currentSelectedProductId);
+
+            if (SceneManager.GetActiveScene().name == "CosmeticsPicker")
+            {
+                lockPanels[6].SetActive(false);
+            }
+
+            //close buy panel
+            CloseBuyPanel();
+        }
+
         #endregion
 
         #region Unlock owned products by checking receipts (store truth)
@@ -322,7 +385,7 @@ namespace Samples.Purchasing.IAP5.Minimal
         /// Apply the local saved unlock status to the game immediately.
         /// This keeps UI consistent while we contact the store.
         /// </summary>
-        void ApplyLocalUnlocks()
+        public void ApplyLocalUnlocks()
         {
             bool isTester = SaveSystem.Instance.LoadGame().testerFlag.isTester;
             foreach (var kv in unlockedProducts)
@@ -330,16 +393,24 @@ namespace Samples.Purchasing.IAP5.Minimal
 
                 if (kv.Value || isTester)
                 {
-                    ApplyUnlockToGame(kv.Key);
+                    ApplyUnlockToGame(kv.Key, isTester);
+                }
+            }
+
+            foreach(var id in nonConsumableProductIds)
+            {
+                if(isTester)
+                {
+                    ApplyUnlockToGame(id, isTester);
                 }
             }
         }
         // -------------------------------------------------------
 
-        private void ApplyUnlockToGame(string productID)
+        private void ApplyUnlockToGame(string productID, bool isTester)
         {
             //apply ad free always if user has
-            if (productID == nonConsumableProductIds[0])
+            if (productID == nonConsumableProductIds[0] || isTester)
             {// ad free
                 GetAdFree(null);
             }
@@ -349,24 +420,39 @@ namespace Samples.Purchasing.IAP5.Minimal
                 return;
             }
 
-            if (productID == nonConsumableProductIds[1])
+            if (productID == nonConsumableProductIds[1] || isTester)
             {// top hat
                 GetTopHat(null);
             }
 
-            if (productID == nonConsumableProductIds[2])
+            if (productID == nonConsumableProductIds[2] || isTester)
             {// banana hat
                 GetBananaHat(null);
             }
 
-            if (productID == nonConsumableProductIds[3])
+            if (productID == nonConsumableProductIds[3] || isTester)
             {// Suit
                 GetSuitCostume(null);
             }
 
-            if (productID == nonConsumableProductIds[4])
+            if (productID == nonConsumableProductIds[4] || isTester)
             {// banana trail
                 GetBananaTrail(null);
+            }
+
+            if (productID == nonConsumableProductIds[5] || isTester)
+            {// orange hat
+                GetOrangeHat(null);
+            }
+
+            if (productID == nonConsumableProductIds[6] || isTester)
+            {// construction hat
+                GetConstructionHat(null);
+            }
+
+            if (productID == nonConsumableProductIds[7] || isTester)
+            {// Get sombrero
+                GetSombreroHat(null);
             }
         }
         #endregion

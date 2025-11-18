@@ -64,7 +64,7 @@ public class AdManager : MonoBehaviour
         LevelPlay.SetMetaData("is_child_directed", "true");
         LevelPlay.SetMetaData("Google_Family_Self_Certified_SDKS", "true");
 
-        LevelPlay.Init(AdConfig.AppKey);
+        /*LevelPlay.Init(AdConfig.AppKey);*/
     }
 
     private void OnGameReset()
@@ -162,39 +162,39 @@ public class AdManager : MonoBehaviour
         LevelPlay.OnImpressionDataReady += ImpressionDataReadyEvent;
 
         // Create Rewarded Video object
-        rewardedVideoAd = new LevelPlayRewardedAd(AdConfig.RewardedVideoAdUnitId);
+        //rewardedVideoAd = new LevelPlayRewardedAd(AdConfig.RewardedVideoAdUnitId);
 
         // Register to Rewarded Video events
         rewardedVideoAd.OnAdLoaded += RewardedVideoOnLoadedEvent;
         rewardedVideoAd.OnAdLoadFailed += RewardedVideoOnAdLoadFailedEvent;
         rewardedVideoAd.OnAdDisplayed += RewardedVideoOnAdDisplayedEvent;
-        rewardedVideoAd.OnAdDisplayFailed += RewardedVideoOnAdDisplayedFailedEvent;
+        //rewardedVideoAd.OnAdDisplayFailed += RewardedVideoOnAdDisplayedFailedEvent;
         rewardedVideoAd.OnAdRewarded += RewardedVideoOnAdRewardedEvent;
         rewardedVideoAd.OnAdClicked += RewardedVideoOnAdClickedEvent;
         rewardedVideoAd.OnAdClosed += RewardedVideoOnAdClosedEvent;
         rewardedVideoAd.OnAdInfoChanged += RewardedVideoOnAdInfoChangedEvent;
 
         // Create Banner object
-        bannerAd = new LevelPlayBannerAd(AdConfig.BannerAdUnitId);
+        //bannerAd = new LevelPlayBannerAd(AdConfig.BannerAdUnitId);
 
         // Register to Banner events
         bannerAd.OnAdLoaded += BannerOnAdLoadedEvent;
         bannerAd.OnAdLoadFailed += BannerOnAdLoadFailedEvent;
         bannerAd.OnAdDisplayed += BannerOnAdDisplayedEvent;
-        bannerAd.OnAdDisplayFailed += BannerOnAdDisplayFailedEvent;
+        //bannerAd.OnAdDisplayFailed += BannerOnAdDisplayFailedEvent;
         bannerAd.OnAdClicked += BannerOnAdClickedEvent;
         bannerAd.OnAdCollapsed += BannerOnAdCollapsedEvent;
         bannerAd.OnAdLeftApplication += BannerOnAdLeftApplicationEvent;
         bannerAd.OnAdExpanded += BannerOnAdExpandedEvent;
 
         // Create Interstitial object
-        interstitialAd = new LevelPlayInterstitialAd(AdConfig.InterstitalAdUnitId);
+        //interstitialAd = new LevelPlayInterstitialAd(AdConfig.InterstitalAdUnitId);
 
         // Register to Interstitial events
         interstitialAd.OnAdLoaded += InterstitialOnAdLoadedEvent;
         interstitialAd.OnAdLoadFailed += InterstitialOnAdLoadFailedEvent;
         interstitialAd.OnAdDisplayed += InterstitialOnAdDisplayedEvent;
-        interstitialAd.OnAdDisplayFailed += InterstitialOnAdDisplayFailedEvent;
+        //interstitialAd.OnAdDisplayFailed += InterstitialOnAdDisplayFailedEvent;
         interstitialAd.OnAdClicked += InterstitialOnAdClickedEvent;
         interstitialAd.OnAdClosed += InterstitialOnAdClosedEvent;
         interstitialAd.OnAdInfoChanged += InterstitialOnAdInfoChangedEvent;
@@ -218,10 +218,10 @@ public class AdManager : MonoBehaviour
         Debug.Log($"[LevelPlaySample] Received RewardedVideoOnAdDisplayedEvent With AdInfo: {adInfo}");
     }
 #pragma warning disable 0618
-    void RewardedVideoOnAdDisplayedFailedEvent(LevelPlayAdDisplayInfoError error)
+/*    void RewardedVideoOnAdDisplayedFailedEvent(LevelPlayAdDisplayInfoError error)
     {
         Debug.Log($"[LevelPlaySample] Received RewardedVideoOnAdDisplayedFailedEvent With Error: {error}");
-    }
+    }*/
 #pragma warning restore 0618
     void RewardedVideoOnAdRewardedEvent(LevelPlayAdInfo adInfo, LevelPlayReward reward)
     {
@@ -261,11 +261,11 @@ public class AdManager : MonoBehaviour
     {
         Debug.Log($"[LevelPlaySample] Received InterstitialOnAdDisplayedEvent With AdInfo: {adInfo}");
     }
-#pragma warning disable 0618
+/*#pragma warning disable 0618
     void InterstitialOnAdDisplayFailedEvent(LevelPlayAdDisplayInfoError infoError)
     {
         Debug.Log($"[LevelPlaySample] Received InterstitialOnAdDisplayFailedEvent With InfoError: {infoError}");
-    }
+    }*/
 #pragma warning restore 0618
     void InterstitialOnAdClickedEvent(LevelPlayAdInfo adInfo)
     {
@@ -307,10 +307,10 @@ public class AdManager : MonoBehaviour
         Debug.Log($"[LevelPlaySample] Received BannerOnAdDisplayedEvent With AdInfo: {adInfo}");
     }
 #pragma warning disable 0618
-    void BannerOnAdDisplayFailedEvent(LevelPlayAdDisplayInfoError adInfoError)
+/*    void BannerOnAdDisplayFailedEvent(LevelPlayAdDisplayInfoError adInfoError)
     {
         Debug.Log($"[LevelPlaySample] Received BannerOnAdDisplayFailedEvent With AdInfoError: {adInfoError}");
-    }
+    }*/
 #pragma warning restore 0618
     void BannerOnAdCollapsedEvent(LevelPlayAdInfo adInfo)
     {

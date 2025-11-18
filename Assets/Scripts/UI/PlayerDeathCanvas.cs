@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using ProfanityFilter;
 
 public class PlayerDeathCanvas : MonoBehaviour
 {
@@ -14,6 +15,12 @@ public class PlayerDeathCanvas : MonoBehaviour
     [SerializeField] private TextMeshProUGUI roundScoreNumber;
     [SerializeField] private RectTransform retryButton;
     [SerializeField] private RectTransform quitButton;
+
+    [SerializeField] private GameObject submitHighscorePanel;
+    [SerializeField] private GameObject tryAgainText;
+    [SerializeField] private TMP_InputField inputField;
+    [SerializeField] private TextMeshProUGUI submitScoreHighScoreText;
+
     private Vector3 retryAnchorPos;
     private Vector3 quitAnchorPos;
 
@@ -61,13 +68,13 @@ public class PlayerDeathCanvas : MonoBehaviour
 
     private void OnPlayerDeath()
     {
-        //if reward ad is ready
+        /*//if reward ad is ready
         if(AdManager.Instance.rewardedVideoAd.IsAdReady() && !AdManager.Instance.hasWatchedAdThisRun && AdManager.Instance.isAdsEnabled)
         {
             //bring up watch video to continue screen
             Invoke(nameof(OpenContinueAdPanel), 2f);
-        }
-        else
+        }*/
+        //else
         {
             //no ad ready so just play normal death screen
             ShowDeathPanelAfterDelay();
@@ -199,6 +206,7 @@ public class PlayerDeathCanvas : MonoBehaviour
                     roundScoreNumber.transform.DOScale(1f, .2f);
                     quitButton.gameObject.SetActive(true);
                     retryButton.gameObject.SetActive(true);
+                    Invoke(nameof(OpenSubmitPanel), .5f);
                     quitButton.DOAnchorPos(quitAnchorPos, .25f).SetEase(Ease.InSine);
                     retryButton.DOAnchorPos(retryAnchorPos, .25f).SetEase(Ease.InSine);
                     Invoke(nameof(CheckIfPlayInterstitial), .25f);
@@ -243,6 +251,7 @@ public class PlayerDeathCanvas : MonoBehaviour
             }
         });
         
+
     }
 
     private void CheckIfPlayInterstitial()
@@ -267,6 +276,43 @@ public class PlayerDeathCanvas : MonoBehaviour
     public void MainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void NoSubmit()
+    {
+        submitHighscorePanel.SetActive(false);
+    }
+
+    public void YesSubmit()
+    {
+        string input = inputField.text;
+        var filter = new ProfanityFilter.ProfanityFilter();
+        if(input.Length < 1 || input.Length > 7 || filter.IsProfanity(input))
+        {
+            //flash try again text
+            tryAgainText.SetActive(true);
+            Invoke(nameof(DisableTryAgainText), 3f);
+        }
+
+        else
+        {
+            //submit highscore
+            LeaderboardSystem.Instance.AddScoreWithMetadata(GameManager.Instance.playerScore, input);
+
+            //close submit panel
+            submitHighscorePanel.SetActive(false);
+        }
+    }
+
+    private void DisableTryAgainText()
+    {
+        tryAgainText.SetActive(false);
+    }
+
+    private void OpenSubmitPanel()
+    {
+        submitHighscorePanel.SetActive(true);
+        submitScoreHighScoreText.text = GameManager.Instance.playerScore.ToString();
     }
 }
 

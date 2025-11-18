@@ -1,5 +1,7 @@
+using Samples.Purchasing.IAP5.Minimal;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -33,6 +35,11 @@ public class CosmeticPicker : MonoBehaviour
     [SerializeField] private RectTransform uiElement;   // Your UI element (anchored)
     [SerializeField] private Camera worldCamera;        // The camera rendering the world
     [SerializeField] private Transform target;          // The world object to move
+
+    [Header("Enter Code")]
+    [SerializeField] private GameObject codePanel;
+    [SerializeField] private TMP_InputField inputField;
+    private const string TESTER_CODE = "awesomeTester25";
 
     private void OnEnable()
     {
@@ -165,10 +172,37 @@ public class CosmeticPicker : MonoBehaviour
     public void BananaHat()
     {
         DeselectAllHats();
-        //set top hat button color as selected
+        //set banana hat button color as selected
         allHatButtonImages[2].color = panelActiveColor;
-        GameManager.Instance.currentHat = allHats[1]; // top hat
+        GameManager.Instance.currentHat = allHats[1]; // banana hat
         cosmeticManager.currentHat = allHats[1];
+    }
+
+    public void OrangeHatHat()
+    {
+        DeselectAllHats();
+        //set orange hat button color as selected
+        allHatButtonImages[3].color = panelActiveColor;
+        GameManager.Instance.currentHat = allHats[2]; // orange hat
+        cosmeticManager.currentHat = allHats[2];
+    }
+
+    public void ConstructionHat()
+    {
+        DeselectAllHats();
+        //set Construction hat button color as selected
+        allHatButtonImages[4].color = panelActiveColor;
+        GameManager.Instance.currentHat = allHats[3]; // Construction hat
+        cosmeticManager.currentHat = allHats[3];
+    }
+
+    public void SombreroHat()
+    {
+        DeselectAllHats();
+        //set Sombrero hat button color as selected
+        allHatButtonImages[5].color = panelActiveColor;
+        GameManager.Instance.currentHat = allHats[4]; // Sombrero hat
+        cosmeticManager.currentHat = allHats[4];
     }
 
     #endregion
@@ -279,4 +313,40 @@ public class CosmeticPicker : MonoBehaviour
         SaveSystem.Instance.SaveCosmetics(GameManager.Instance.currentHat, GameManager.Instance.currentShirt, GameManager.Instance.currentTrail);
         SceneManager.LoadScene("MainMenu");
     }
+
+    #region Enter Code
+
+    public void OpenEnterCodePanel()
+    {
+        codePanel.SetActive(true);
+        inputField.text = "";
+    }
+
+    public void EnterCode()
+    {
+        if(inputField.text == TESTER_CODE)
+        {
+            //set tester flag
+            SaveSystem.Instance.SetTester();
+
+            //reload items unlocks
+            GetComponent<ShopManager>().ApplyLocalUnlocks();
+
+            //pop up text saying successful unlock
+        }
+        else
+        {
+            //pop up invalid text
+        }
+
+        CloseEnterCodePanel();
+    }
+
+    public void CloseEnterCodePanel()
+    {
+        codePanel.SetActive(false);
+        inputField.text = "";
+    }
+
+    #endregion
 }

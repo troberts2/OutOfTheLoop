@@ -129,4 +129,15 @@ public class SaveSystem : MonoBehaviour
         File.WriteAllText(fullPath, json);
         Debug.Log("saved to " + fullPath);
     }
+
+    public void SetTester()
+    {
+        SaveFile save = LoadGame();
+
+        save.testerFlag.isTester = true;
+        //actually write and save in json
+        string json = JsonUtility.ToJson(save, true); // 'true' for pretty print (optional)
+        File.WriteAllText(fullPath, json);
+        Debug.Log("saved to " + fullPath);
+    }
 }
