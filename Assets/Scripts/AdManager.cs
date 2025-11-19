@@ -33,15 +33,15 @@ public class AdManager : MonoBehaviour
 
     private void OnEnable()
     {
-        LevelPlay.OnInitSuccess += SdkInitializationSuccessEvent;
-        LevelPlay.OnInitFailed += SdkInitializationFailedEvent;
+        //LevelPlay.OnInitSuccess += SdkInitializationSuccessEvent;
+        //LevelPlay.OnInitFailed += SdkInitializationFailedEvent;
         GameManager.OnGameReset += OnGameReset;
     }
 
     private void OnDisable()
     {
-        LevelPlay.OnInitSuccess -= SdkInitializationSuccessEvent;
-        LevelPlay.OnInitFailed -= SdkInitializationFailedEvent;
+        //LevelPlay.OnInitSuccess -= SdkInitializationSuccessEvent;
+        //LevelPlay.OnInitFailed -= SdkInitializationFailedEvent;
         GameManager.OnGameReset -= OnGameReset;
 
         bannerAd?.DestroyAd();
@@ -55,16 +55,16 @@ public class AdManager : MonoBehaviour
 
     private void Start()
     {
-        LevelPlay.ValidateIntegration();
+        //LevelPlay.ValidateIntegration();
         // Optional: enable verbose logging
-        LevelPlay.SetAdaptersDebug(true);
+        //LevelPlay.SetAdaptersDebug(true);
         //LevelPlay.SetMetaData("is_test_suite", "enable");
 
-        LevelPlay.SetMetaData("is_deviceid_optout", "true");
-        LevelPlay.SetMetaData("is_child_directed", "true");
-        LevelPlay.SetMetaData("Google_Family_Self_Certified_SDKS", "true");
+        //LevelPlay.SetMetaData("is_deviceid_optout", "true");
+        //LevelPlay.SetMetaData("is_child_directed", "true");
+        //LevelPlay.SetMetaData("Google_Family_Self_Certified_SDKS", "true");
 
-        LevelPlay.Init(AdConfig.AppKey);
+        //LevelPlay.Init(myAppKey);
     }
 
     private void OnGameReset()
@@ -144,9 +144,9 @@ public class AdManager : MonoBehaviour
     private void SdkInitializationSuccessEvent(LevelPlayConfiguration config)
     {
         Debug.Log("Initialized levelPlay success");
-        EnableAds();
-        LoadInterstitial();
-        LoadRewarded();
+        //EnableAds();
+        //LoadInterstitial();
+        //LoadRewarded();
 
         //LevelPlay.LaunchTestSuite();
     }
@@ -162,7 +162,7 @@ public class AdManager : MonoBehaviour
         LevelPlay.OnImpressionDataReady += ImpressionDataReadyEvent;
 
         // Create Rewarded Video object
-        rewardedVideoAd = new LevelPlayRewardedAd(AdConfig.RewardedVideoAdUnitId);
+        //rewardedVideoAd = new LevelPlayRewardedAd(adUnitRewarded);
 
         // Register to Rewarded Video events
         rewardedVideoAd.OnAdLoaded += RewardedVideoOnLoadedEvent;
@@ -175,7 +175,7 @@ public class AdManager : MonoBehaviour
         rewardedVideoAd.OnAdInfoChanged += RewardedVideoOnAdInfoChangedEvent;
 
         // Create Banner object
-        bannerAd = new LevelPlayBannerAd(AdConfig.BannerAdUnitId);
+       // bannerAd = new LevelPlayBannerAd(adUnitBanner);
 
         // Register to Banner events
         bannerAd.OnAdLoaded += BannerOnAdLoadedEvent;
@@ -188,7 +188,7 @@ public class AdManager : MonoBehaviour
         bannerAd.OnAdExpanded += BannerOnAdExpandedEvent;
 
         // Create Interstitial object
-        interstitialAd = new LevelPlayInterstitialAd(AdConfig.InterstitalAdUnitId);
+       // interstitialAd = new LevelPlayInterstitialAd(adUnitInterstitial);
 
         // Register to Interstitial events
         interstitialAd.OnAdLoaded += InterstitialOnAdLoadedEvent;
